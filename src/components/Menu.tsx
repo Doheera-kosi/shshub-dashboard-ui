@@ -24,6 +24,12 @@ const menuItems = [
         href: "/list/students",
         visible: ["admin", "teacher"],
       },
+    {
+        icon: "/admission.png",
+        label: "New Admission", // Quick access from menu
+        href: "/admissions", // Direct top-level route
+        visible: ["admin", "teacher"],
+    },
       {
         icon: "/parent.png",
         label: "Parents",
