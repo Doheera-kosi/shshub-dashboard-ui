@@ -81,7 +81,7 @@ const UserCard = ({ type }: { type: string }) => {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-4 flex-1 min-w-[130px]">
+    <div className="rounded-2xl shadow-sm bg-white p-4 flex-1 min-w-[130px]">
       <div className="flex justify-between items-center mb-4">
         <h2 className="capitalize text-sm font-medium text-gray-500">{type}s</h2>
         <span className="text-[10px] bg-purple-100 p-2 rounded-full text-purple-600">
