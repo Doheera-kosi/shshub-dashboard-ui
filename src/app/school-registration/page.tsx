@@ -1,0 +1,177 @@
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+
+const regions = [
+  { name: 'Greater Accra', districts: ['Accra', 'Tema', 'Ga East'] },
+  { name: 'Ashanti', districts: ['Kumasi', 'Obuasi', 'Ejisu'] },
+  { name: 'Eastern', districts: ['Koforidua', 'Aburi', 'Nkawkaw'] },
+];
+
+const schools = [
+  { name: 'Accra Academy', district: 'Accra', description: 'A premier secondary school.', category: 'A', coverImage: '/accra-academy.jpg', logoImage: '/accra-academy.jpg' },
+  { name: 'Tema Senior High School', district: 'Tema', description: 'An international baccalaureate school.', category: 'B/C', coverImage: '/temasco.png', logoImage: '/temasco.png' },
+  { name: "Aburi Girls' Senior High School", district: 'Aburi', description: "A leading girls' school.", category: 'A', coverImage: '/aburi-girls.jpeg', logoImage: '/aburi-girls.jpeg' },
+  { name: 'Prempeh College', district: 'Kumasi', description: "A prestigious boys' school.", category: 'A', coverImage: '/temasco.png', logoImage: '/temasco.png' },
+  { name: 'St. Roses Senior High', district: 'Nkawkaw', description: 'A well-regarded secondary school.', category: 'A', coverImage: '/temasco.png', logoImage: '/temasco.png' },
+];
+
+type CustomSelectOption = { value: string; label: string };
+
+interface CustomSelectProps {
+    value: string;
+    onChange: (e: { target: { value: string } }) => void;
+    options: CustomSelectOption[];
+    placeholder?: string;
+    disabled?: boolean;
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, placeholder, disabled }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleSelect = (optionValue: string) => {
+        const event = { target: { value: optionValue } };
+        onChange(event);
+        setIsOpen(false);
+    };
+    
+    const selectedOption = options.find(o => o.value === value);
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                className={`w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                disabled={disabled}
+            >
+                <span className={value ? 'text-black' : 'text-gray-500'}>{selectedOption ? selectedOption.label : placeholder}</span>
+                <svg className={`w-5 h-5 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            {isOpen && (
+                <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {placeholder && !options.find(o => o.value === '') &&
+                        <li
+                            className="p-3 hover:bg-gray-100 cursor-pointer text-gray-500"
+                            onClick={() => handleSelect('')}
+                        >
+                            {placeholder}
+                        </li>
+                    }
+                    {options.map(option => (
+                        <li
+                            key={option.value}
+                            className="p-3 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => handleSelect(option.value)}
+                        >
+                            {option.label}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+};
+
+const SchoolRegistration = () => {
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleRegionChange = (e: React.ChangeEvent<HTMLButtonElement> | { target: { value: string } }) => {
+    setSelectedRegion(e.target.value);
+    setSelectedDistrict('');
+  };
+
+  const filteredDistricts = regions.find(r => r.name === selectedRegion)?.districts || [];
+
+  const filteredSchools = schools.filter(school => {
+    return (
+      (!selectedRegion || regions.find(r => r.name === selectedRegion)?.districts.includes(school.district)) &&
+      (!selectedDistrict || school.district === selectedDistrict) &&
+      school.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+  
+  const regionOptions = regions.map(region => ({ value: region.name, label: region.name }));
+  const districtOptions = filteredDistricts.map(district => ({ value: district, label: district }));
+
+  return (
+    <div
+      /* className="min-h-screen bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage: "url('/interschools-sports-1.jpg')",
+      }} */
+    >
+      {/* <div className="min-h-screen bg-black/60 p-6"> */}
+      <div className="min-h-screen p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Image src="/logos/MOE-logo.png" alt="MOE Logo" width={200} height={200} />
+          </div>
+          
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-2 text-blue-700">Welcome to the Admission Registration Page</h1>
+            <p className="text-gray-700 my-6">
+              We’ve made it simple for you to begin your admission process. Just select your Region and District, then search for your assigned school. Enter your Index Number to verify your placement, and once confirmed, hit Proceed to continue with your admission form.
+            </p>
+          </div>
+          
+          <div className="relative z-20 bg-blue-600 backdrop-blur-sm p-6 rounded-lg shadow-md mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <CustomSelect
+                value={selectedRegion}
+                onChange={handleRegionChange}
+                options={regionOptions}
+                placeholder="Select Region"
+              />
+
+              <CustomSelect
+                value={selectedDistrict}
+                onChange={e => setSelectedDistrict(e.target.value)}
+                options={districtOptions}
+                placeholder="Select District"
+                disabled={!selectedRegion}
+              />
+
+              <input
+                type="text"
+                placeholder="Search for a school..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredSchools.map(school => (
+              <div key={school.name} className="relative bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
+                <div className="h-40 bg-cover bg-center rounded-t-lg" style={{ backgroundImage: `url(${school.coverImage})` }}></div>
+                <div className="absolute top-40 left-[15%] transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center">
+                        <Image src={school.logoImage} alt={`${school.name} logo`} width={40} height={40} objectFit="contain" />
+                    </div>
+                </div>
+                <div className="pt-12 p-6">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">{school.name}</h3>
+                        <p className="text-gray-600 mb-4">Category: <span className="font-semibold">{school.category}</span></p>
+                    </div>
+                    <div className="flex justify-end">
+                        <button className="bg-blue-600 text-white py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-transform duration-300 transform hover:scale-105">
+                            start here
+                        </button>
+                    </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SchoolRegistration;
