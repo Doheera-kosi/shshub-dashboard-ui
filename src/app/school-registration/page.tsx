@@ -127,7 +127,7 @@ const SchoolRegistration = () => {
           </div>
           
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-blue-700">Welcome to the Admission Registration Page</h1>
+            <h1 className="text-4xl font-bold mb-2 text-blue-700">Welcome to the Admission Registration Portal</h1>
             <p className="text-gray-700 my-6">
               We’ve made it simple for you to begin your admission process. Just select your Region and District, then search for your assigned school. Enter your Index Number to verify your placement, and once confirmed, hit Proceed to continue with your admission form.
             </p>
@@ -162,7 +162,7 @@ const SchoolRegistration = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredSchools.map(school => (
-              <div key={school.name} className="relative bg-white rounded-lg shadow-lg">
+              <div key={school.name} className="relative bg-white rounded-2xl shadow-sm">
                 <div className="h-40 bg-cover bg-center rounded-t-lg" style={{ backgroundImage: `url(${school.coverImage})` }}></div>
                 <div className="absolute top-40 left-[15%] transform -translate-x-1/2 -translate-y-1/2">
                     <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center">
