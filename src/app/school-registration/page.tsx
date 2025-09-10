@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import AdmissionConfirmationModal from '@/components/modals/AdmissionConfirmationModal';
 
 const regions = [
   { name: 'Greater Accra', districts: ['Accra', 'Tema', 'Ga East'] },
@@ -9,12 +11,22 @@ const regions = [
   { name: 'Eastern', districts: ['Koforidua', 'Aburi', 'Nkawkaw'] },
 ];
 
-const schools = [
-  { name: 'Accra Academy', district: 'Accra', description: 'A premier secondary school.', category: 'A', coverImage: '/accra-academy.jpg', logoImage: '/accra-academy.jpg' },
-  { name: 'Tema Senior High School', district: 'Tema', description: 'An international baccalaureate school.', category: 'B/C', coverImage: '/temasco.png', logoImage: '/temasco.png' },
-  { name: "Aburi Girls' Senior High School", district: 'Aburi', description: "A leading girls' school.", category: 'A', coverImage: '/aburi-girls.jpeg', logoImage: '/aburi-girls.jpeg' },
-  { name: 'Prempeh College', district: 'Kumasi', description: "A prestigious boys' school.", category: 'A', coverImage: '/temasco.png', logoImage: '/temasco.png' },
-  { name: 'St. Roses Senior High', district: 'Nkawkaw', description: 'A well-regarded secondary school.', category: 'A', coverImage: '/temasco.png', logoImage: '/temasco.png' },
+interface School {
+  name: string;
+  district: string;
+  description: string;
+  category: string;
+  coverImage: string;
+  logoImage: string;
+  indexNumber: string;
+}
+
+const schools: School[] = [
+  { name: 'Accra Academy', district: 'Accra', description: 'A premier secondary school.', category: 'A', coverImage: '/prempeh-college-ad-2.jpg', logoImage: '/accra-academy.jpg', indexNumber: 'AA123' },
+  { name: 'Tema Senior High School', district: 'Tema', description: 'An international baccalaureate school.', category: 'B/C', coverImage: '/temasco-ad-1.jpg', logoImage: '/temasco.png', indexNumber: 'TS456' },
+  { name: "Aburi Girls' Senior High School", district: 'Aburi', description: "A leading girls' school.", category: 'A', coverImage: '/aburi-girls-ad-2.jpg', logoImage: '/aburi-girls.jpeg', indexNumber: 'AG789' },
+  { name: 'Prempeh College', district: 'Kumasi', description: "A prestigious boys' school.", category: 'A', coverImage: '/prempeh-college-ad-1.jpg', logoImage: '/prempeh-col-logo-2.png', indexNumber: 'PC101' },
+  { name: 'St. Roses Senior High', district: 'Nkawkaw', description: 'A well-regarded secondary school.', category: 'A', coverImage: '/temasco-ad-1.jpg', logoImage: '/temasco.png', indexNumber: 'SR112' },
 ];
 
 type CustomSelectOption = { value: string; label: string };
@@ -75,6 +87,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, p
 };
 
 const SchoolRegistration = () => {
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,7 +113,7 @@ const SchoolRegistration = () => {
   const districtOptions = filteredDistricts.map(district => ({ value: district, label: district }));
 
   return (
-    <div
+    <div className='bg-[#F7F8FA]'
       /* className="min-h-screen bg-cover bg-center bg-fixed"
       style={{
         backgroundImage: "url('/interschools-sports-1.jpg')",
@@ -118,7 +133,7 @@ const SchoolRegistration = () => {
             </p>
           </div>
           
-          <div className="relative z-20 bg-blue-600 backdrop-blur-sm p-6 rounded-lg shadow-md mb-8">
+          <div className="relative z-20 bg-blue-600 backdrop-blur-sm p-4 rounded-2xl shadow-sm mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <CustomSelect
                 value={selectedRegion}
@@ -147,7 +162,7 @@ const SchoolRegistration = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredSchools.map(school => (
-              <div key={school.name} className="relative bg-white rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
+              <div key={school.name} className="relative bg-white rounded-lg shadow-lg">
                 <div className="h-40 bg-cover bg-center rounded-t-lg" style={{ backgroundImage: `url(${school.coverImage})` }}></div>
                 <div className="absolute top-40 left-[15%] transform -translate-x-1/2 -translate-y-1/2">
                     <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center">
@@ -160,7 +175,10 @@ const SchoolRegistration = () => {
                         <p className="text-gray-600 mb-4">Category: <span className="font-semibold">{school.category}</span></p>
                     </div>
                     <div className="flex justify-end">
-                        <button className="bg-blue-600 text-white py-2 px-6 rounded-full shadow-md hover:bg-blue-700 transition-transform duration-300 transform hover:scale-105">
+                        <button onClick={() => {
+                          setSelectedSchool(school);
+                          setIsModalOpen(true);
+                        }} className="bg-gray-400 text-white py-2 px-6 rounded-full shadow-md hover:bg-blue-600 transition-transform duration-300 transform hover:scale-105">
                             start here
                         </button>
                     </div>
@@ -168,6 +186,21 @@ const SchoolRegistration = () => {
               </div>
             ))}
           </div>
+
+          {selectedSchool && isModalOpen && (
+            <AdmissionConfirmationModal
+              school={{
+                name: selectedSchool.name,
+                indexNumber: selectedSchool.indexNumber,
+              }}
+              onClose={() => setIsModalOpen(false)}
+              onConfirm={() => {
+                // Add your confirm logic here, e.g., navigate to the next step
+                setIsModalOpen(false);
+                // router.push('/next-step'); // Uncomment and set the correct route if needed
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
