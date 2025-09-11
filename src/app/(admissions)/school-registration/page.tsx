@@ -113,19 +113,7 @@ const SchoolRegistration = () => {
   const districtOptions = filteredDistricts.map(district => ({ value: district, label: district }));
 
   return (
-    <div className='bg-[#F7F8FA]'
-      /* className="min-h-screen bg-cover bg-center bg-fixed"
-      style={{
-        backgroundImage: "url('/interschools-sports-1.jpg')",
-      }} */
-    >
-      {/* <div className="min-h-screen bg-black/60 p-6"> */}
-      <div className="min-h-screen p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-6">
-            <Image src="/logos/MOE-logo.png" alt="MOE Logo" width={200} height={200} />
-          </div>
-          
+        <div className="">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-2 text-blue-700">Welcome to the Admission Registration Portal</h1>
             <p className="text-gray-700 my-6">
@@ -202,8 +190,6 @@ const SchoolRegistration = () => {
             />
           )}
         </div>
-      </div>
-    </div>
   );
 };
 
