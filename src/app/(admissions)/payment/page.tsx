@@ -104,11 +104,6 @@ const PaymentPage = () => {
                 <label htmlFor="phoneNumber" className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1">Phone Number</label>
                 {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
             </div>
-            <div className="relative">
-                <input type="password" id="pin" name="pin" required className={`block w-full px-2.5 pb-2.5 pt-4 text-sm text-gray-900 bg-transparent rounded-lg border ${errors.pin ? 'border-red-500' : 'border-gray-300'} appearance-none focus:outline-none focus:ring-0 ${errors.pin ? 'focus:border-red-500' : 'focus:border-blue-600'} peer`} placeholder=" " />
-                <label htmlFor="pin" className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1">Transaction PIN</label>
-                {errors.pin && <p className="text-red-500 text-xs mt-1">{errors.pin}</p>}
-            </div>
             <button type="submit" className="w-full bg-gray-400 text-white py-3 rounded-md shadow-md hover:bg-blue-600 transition-colors duration-300 transform hover:scale-105">Pay Now</button>
           </form>
         );
