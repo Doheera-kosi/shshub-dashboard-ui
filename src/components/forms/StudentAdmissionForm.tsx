@@ -978,9 +978,13 @@ const StudentAdmissionForm = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">Student Admission Form</h1>
       
-      <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="bg-white rounded-2xl shadow-sm p-6">
+        <h1 className="text-2xl font-bold mb-6">Student Admission Form</h1>
+        <p className="text-red-500 mb-4">
+          Please complete the admission form below with accurate information. The details you provide will be reviewed by the school you’re applying to, so kindly ensure all fields are filled correctly.
+        </p>
+        
         <div className="mb-6">
           <div className="flex justify-between items-center">
             <div className={`text-center ${currentSection >= 1 ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
