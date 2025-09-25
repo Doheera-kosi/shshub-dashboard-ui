@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { role } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";
@@ -124,6 +127,14 @@ const menuItems = [
 ];
 
 const Menu = () => {
+
+  const [userType, setUserType] = useState("");
+
+  useEffect(() => {
+    const userType = localStorage.getItem("userType");
+    setUserType(userType ?? "");
+  }, []);
+
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((i) => (
@@ -132,7 +143,7 @@ const Menu = () => {
             {i.title}
           </span>
           {i.items.map((item) => {
-            if (item.visible.includes(role)) {
+            if (item.visible.includes(userType)) {
               return (
                 <Link
                   href={item.href}

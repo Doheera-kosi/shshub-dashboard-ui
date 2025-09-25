@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
+
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { CheckCircle, Clock, XCircle, TrendingUp, ArrowRight } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, TrendingUp, ArrowRight, ChevronRight } from 'lucide-react';
 
 const InfoCard = ({ title, value, icon, trend, sparklineData, color }: { title: string, value: string, icon: JSX.Element, trend?: string, sparklineData?: any[], color?: string }) => {
   return (
@@ -32,11 +34,10 @@ const InfoCard = ({ title, value, icon, trend, sparklineData, color }: { title: 
 
 const ProgressTracker = () => {
   const stages = [
-    { name: 'Profile Creation', status: 'completed' },
-    { name: 'Profile Verification', status: 'completed' },
-    { name: 'School Selection', status: 'current' },
-    { name: 'Awaiting Response', status: 'upcoming' },
-    { name: 'Final Decision', status: 'upcoming' },
+    { name: 'Admission application', status: 'completed' },
+    { name: 'Fees payment', status: 'current' },
+    { name: 'Profile Setup', status: 'upcoming' },
+    { name: 'Student Onboarding', status: 'upcoming' },
   ];
 
   const getStatusColor = (status: string) => {
@@ -46,21 +47,21 @@ const ProgressTracker = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm">
-      <h3 className="text-lg font-semibold mb-6">Application Progress</h3>
+    <div className="bg-blue-600 p-6 rounded-2xl shadow-sm">
+      <h3 className="text-lg text-white font-semibold mb-6">Application Progress</h3>
       <div className="flex items-center justify-between">
         {stages.map((stage, index) => (
-          <div key={stage.name} className="flex items-center flex-1">
+          <React.Fragment key={stage.name}>
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white ${getStatusColor(stage.status)}`}>
                 {stage.status === 'completed' ? <CheckCircle size={20} /> : index + 1}
               </div>
-              <p className="text-xs text-center mt-2 w-20 h-10 flex items-center justify-center">{stage.name}</p>
+              <p className="text-sm text-center text-white mt-2 w-20 h-10 flex items-center justify-center">{stage.name}</p>
             </div>
             {index < stages.length - 1 && (
-              <div className={`flex-1 h-1 ${getStatusColor(stages[index + 1].status)}`}></div>
+              <div className={`flex-1 h-1 mx-2 ${getStatusColor(stages[index + 1].status)}`}></div>
             )}
-          </div>
+          </React.Fragment>
         ))}
       </div>
     </div>
@@ -125,69 +126,56 @@ const SchoolCategoryChart = () => {
   );
 };
 
-const AcceptanceGradeCard = () => {
-  const studentGrade = 15;
-  const categoryAReq = { min: 7, max: 12 };
-  const categoryBReq = { min: 13, max: 24 };
-  const categoryCReq = { min: 25, max: null };
+const SchoolFeesCard = () => {
+  const fees = [
+    { name: 'Tuition', status: 'completed', amount: '5,000' },
+    { name: 'Feeding', status: 'pending', amount: '1,200' },
+    { name: 'Accommodation', status: 'completed', amount: '2,500' },
+    { name: 'SRC', status: 'pending', amount: '100' },
+  ];
 
-  const GradeRequirementBar = ({ studentGrade, req, categoryName }: { studentGrade: number, req: {min: number, max: number | null}, categoryName: string }) => {
-    const getStatus = () => {
-      if (studentGrade < req.min) {
-        return 'overqualified';
-      }
-      if (req.max === null) {
-        return 'qualified';
-      }
-      if (studentGrade >= req.min && studentGrade <= req.max) {
-        return 'qualified';
-      }
-      return 'underqualified';
-    };
+  // Sort fees to show completed first
+  const sortedFees = [...fees].sort((a, b) => {
+    if (a.status === 'completed' && b.status !== 'completed') {
+      return -1;
+    }
+    if (a.status !== 'completed' && b.status === 'completed') {
+      return 1;
+    }
+    return 0;
+  });
 
-    const status = getStatus();
-
-    const getBarColor = () => {
-      switch (status) {
-        case 'qualified':
-          return 'bg-green-500';
-        case 'overqualified':
-          return 'bg-green-500';
-        case 'underqualified':
-          return 'bg-red-500';
-        default:
-          return 'bg-gray-200';
-      }
-    };
-
-    const requirementText = `${req.min}${req.max === null ? '+' : `-${req.max}`}`;
-    const progress = (status === 'underqualified') ? 0 : 100;
-
-    return (
-      <div className="mb-2">
-        <div className="flex justify-between text-sm font-medium">
-          <span>{categoryName}</span>
-          <span className='text-yellow-400'>{requirementText}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-          <div className={`${getBarColor()} h-2.5 rounded-full`} style={{ width: `${progress}%` }}></div>
-        </div>
-      </div>
-    );
+  const getStatusPill = (status: string) => {
+    if (status === 'completed') {
+      return <span className="px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Completed</span>;
+    }
+    return <span className="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
   };
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm flex-1">
-      <h3 className="text-lg font-semibold mb-4">Acceptance Grade</h3>
-      <div className="text-center">
-        <p className="text-sm text-gray-500">Your Aggregate</p>
-        <p className="text-4xl font-bold text-blue-400">{studentGrade}</p>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-lg font-semibold">School Fees</h3>
+        <button className="text-sm text-blue-600 flex items-center font-semibold rounded-xs px-4 py-2 bg-blue-100 hover:underline">See more<ChevronRight className="ml-1 w-4 h-4 font-bold text-blue-600" /></button>
       </div>
-      <div className="mt-4">
-        <GradeRequirementBar studentGrade={studentGrade} req={categoryAReq} categoryName="Category A" />
-        <GradeRequirementBar studentGrade={studentGrade} req={categoryBReq} categoryName="Category B" />
-        <GradeRequirementBar studentGrade={studentGrade} req={categoryCReq} categoryName="Category C" />
-      </div>
+      <table className="w-full text-sm text-left text-gray-500">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+          <tr>
+            <th scope="col" className="px-4 py-2">Fee</th>
+            <th scope="col" className="px-4 py-2">Amount</th>
+            <th scope="col" className="px-4 py-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedFees.map(fee => (
+            <tr key={fee.name} className="bg-white border-b">
+              <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap">{fee.name}</td>
+              <td className="px-4 py-2">GH₵{fee.amount}</td>
+              <td className="px-4 py-2">{getStatusPill(fee.status)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -208,4 +196,4 @@ const Recommendations = () => {
   );
 };
 
-export { InfoCard, ProgressTracker, SchoolCategoryChart, AcceptanceGradeCard, Recommendations };
+export { InfoCard, ProgressTracker, SchoolCategoryChart, SchoolFeesCard, Recommendations };

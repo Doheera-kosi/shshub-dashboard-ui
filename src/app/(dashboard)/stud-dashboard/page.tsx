@@ -1,4 +1,9 @@
-import { InfoCard, ProgressTracker, SchoolCategoryChart, AcceptanceGradeCard, Recommendations } from "@/components/StudentDashboardComponents";
+"use client";
+
+import { useEffect } from "react";
+
+
+import { InfoCard, ProgressTracker, SchoolCategoryChart, SchoolFeesCard, Recommendations } from "@/components/StudentDashboardComponents";
 import { CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
 
 const sparklineData = [
@@ -10,6 +15,11 @@ const sparklineData = [
 ];
 
 const StudentDashboardPage = () => {
+  useEffect(() => {
+    // Only runs on the client
+    localStorage.setItem("userType", "student");
+  }, []);
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">My Dashboard</h1>
@@ -52,7 +62,7 @@ const StudentDashboardPage = () => {
       {/* Row 3: School Selection Insights */}
       <div className="flex flex-col lg:flex-row gap-8 mb-8">
         <SchoolCategoryChart />
-        <AcceptanceGradeCard />
+        <SchoolFeesCard />
       </div>
 
       {/* Row 4: Recommended Actions */}
