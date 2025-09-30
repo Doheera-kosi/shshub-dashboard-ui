@@ -179,7 +179,7 @@ const Menu = () => {
       // const response = { ok: true };
       // const result = { status: "success", message: "File uploaded successfully" };
 
-      if (response.ok && result.status === "success") {
+      if (response.ok && (result.status === "success" || result.count > 0)) {
         setPopupStatus("success");
         setPopupMessage(result.message || "File uploaded successfully");
       } else {
