@@ -115,7 +115,7 @@ const Menu = () => {
           icon: "/announcement.png",
           label: "Announcements",
           href: "/list/announcements",
-          visible: ["admin", "teacher", "student", "parent"],
+          visible: ["teacher", "student", "parent"],
         },
       ],
     },

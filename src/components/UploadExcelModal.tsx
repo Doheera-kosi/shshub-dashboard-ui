@@ -29,7 +29,7 @@ const UploadExcelModal: React.FC<UploadExcelModalProps> = ({ isOpen, onClose, on
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-md">
-        <h2 className="text-lg font-bold mb-4">Upload Excel File</h2>
+        <h2 className="text-lg font-bold mb-4">Upload Student List</h2>
                 <input type="file" accept=".xlsx, .xls, .csv" onChange={handleFileChange} />
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">Cancel</button>
