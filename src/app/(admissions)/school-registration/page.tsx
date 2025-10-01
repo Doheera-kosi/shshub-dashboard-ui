@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import AdmissionConfirmationModal from '@/components/modals/AdmissionConfirmationModal';
@@ -93,6 +93,27 @@ const SchoolRegistration = () => {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  //const [regions, setRegions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  /* useEffect(() => {
+    async function fetchRegions() {
+      try {
+        const res = await fetch("https://84.247.136.103/api/v1/students");
+        if (!res.ok) throw new Error("Failed to fetch regions");
+        const data = await res.json();
+        setRegions(data);
+        console.log('List of regions: ', data);
+      } catch (err) {
+        console.error("Error fetching regions:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRegions();
+  }, []); */
+  
 
   const handleRegionChange = (e: React.ChangeEvent<HTMLButtonElement> | { target: { value: string } }) => {
     setSelectedRegion(e.target.value);
@@ -110,7 +131,7 @@ const SchoolRegistration = () => {
   });
   
   const regionOptions = regions.map(region => ({ value: region.name, label: region.name }));
-  const districtOptions = filteredDistricts.map(district => ({ value: district, label: district }));
+  const districtOptions = filteredDistricts.map((district: string) => ({ value: district, label: district }));
 
   return (
         <div className="">
