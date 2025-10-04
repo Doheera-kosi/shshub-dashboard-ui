@@ -4,15 +4,32 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ghanaLocationData, schoolsData } from '@/lib/ghanaData';
+import { studentAPI, StudentAdmissionData } from '../../services/api';
 
 // Complete schema with all fields
 const studentFormSchema = z.object({
-  // Section 1: Student Bio
+  id: z.number().optional(),
   indexNumber: z.string().min(1, "Index Number is required"),
+  name: z.string().min(1, "Full Name is required"),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"]),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+  programId: z.number(),
+  accommodationId: z.number().optional(),
+  classId: z.number().optional(),
+  houseId: z.number().optional(),
+  track: z.enum(["ACADEMIC", "VOCATIONAL", "TECHNICAL"]),
+  entryStatus: z.number(),
+  timestamp: z.string(),
+  ip: z.string(),
+  key: z.string(),
+  lastupdated: z.string(),
+  createdBy: z.string(),
+  updatedBy: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+
+  // Section 1: Student Bio
   enrolmentCode: z.string().min(1, "Enrolment Code is required"),
-  fullName: z.string().min(1, "Full Name is required"),
-  gender: z.string().min(1, "Gender is required"),
   dateOfBirth: z.string().min(1, "Date of Birth is required"),
   placeOfBirth: z.string().min(1, "Place of Birth is required"),
   region: z.string().min(1, "Region is required"),
@@ -20,11 +37,6 @@ const studentFormSchema = z.object({
   homeTown: z.string().min(1, "Home Town is required"),
   address: z.string().optional(),
   religion: z.string().min(1, "Religion is required"),
-  program: z.string().min(1, "Program is required"),
-  track: z.string().min(1, "Track is required"),
-  status: z.enum(["Day", "Boarding"], { // CHANGED TO ENUM
-    required_error: "Please select Day or Boarding status",
-  }),
   dateOfEnrolment: z.string().min(1, "Date of Enrolment is required"),
   ghanaCardNo: z.string().optional(),
   nhis: z.string().optional(),
@@ -37,25 +49,26 @@ const studentFormSchema = z.object({
   
   // Section 2: Guardian Info
   guardian: z.object({
+    id: z.number().optional(),
     firstName: z.string().min(1, "First Name is required"),
     middleName: z.string().optional(),
     lastName: z.string().min(1, "Last Name is required"),
-    gender: z.string().min(1, "Gender is required"),
+    gender: z.enum(["MALE", "FEMALE", "OTHER"]),
+    relationship: z.string().min(1, "Relationship is required"),
     occupation: z.string().min(1, "Occupation is required"),
     phone: z.string().min(1, "Phone is required").regex(/^\+?[0-9]{10,15}$/, "Invalid phone number"),
     email: z.string().email("Invalid email address").optional().or(z.literal("")),
+    createdBy: z.string().optional(),
+    updatedBy: z.string().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
   }),
   
   hasSecondGuardian: z.enum(["Yes", "No"]).optional(),
   
   secondGuardian: z.object({
     firstName: z.string().optional(),
-    middleName: z.string().optional(),
-    lastName: z.string().optional(),
-    gender: z.string().optional(),
-    occupation: z.string().optional(),
     phone: z.string().optional(),
-    email: z.string().email("Invalid email address").optional().or(z.literal("")),
   }).optional(),
   
   // Certification
@@ -66,35 +79,22 @@ const studentFormSchema = z.object({
 
 type StudentFormData = z.infer<typeof studentFormSchema>;
 
-// Mock API call function
-const fetchStudentData = async (indexNumber: string) => {
-  return new Promise<Partial<StudentFormData>>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        fullName: "Pascal Mark",
-        gender: "Male",
-        program: "General Science",
-        track: "Science",
-        status: "Day",
-        dateOfEnrolment: "2023-09-01",
-      });
-    }, 500);
-  });
-};
-
 const StudentAdmissionForm = () => {
   const [currentSection, setCurrentSection] = useState(1);
+  const [regions, setRegions] = useState<any[]>([]);
   const [districts, setDistricts] = useState<string[]>([]);
   const [towns, setTowns] = useState<string[]>([]);
   const [schools, setSchools] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [submissionCompleted, setSubmissionCompleted] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    setError,
+    reset,
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<StudentFormData>({
@@ -105,6 +105,67 @@ const StudentAdmissionForm = () => {
     },
   });
 
+  const onSubmit = async (data: StudentFormData) => {
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    const admissionData: StudentAdmissionData = {
+      // Map all form fields explicitly, excluding UI-only fields
+      id: data.id,
+      indexNumber: data.indexNumber,
+      name: data.name,
+      gender: data.gender,
+      status: data.status,
+      track: data.track,
+      enrolmentCode: data.enrolmentCode,
+      dateOfBirth: data.dateOfBirth,
+      placeOfBirth: data.placeOfBirth,
+      region: data.region,
+      district: data.district,
+      homeTown: data.homeTown,
+      address: data.address,
+      religion: data.religion,
+      dateOfEnrolment: data.dateOfEnrolment,
+      ghanaCardNo: data.ghanaCardNo,
+      nhis: data.nhis,
+      jhsCompleted: data.jhsCompleted,
+      sports: data.sports,
+      healthConditions: data.healthConditions,
+      school: data.school,
+      accommodationId: data.accommodationId,
+      classId: data.classId,
+      houseId: data.houseId,
+
+      // Map guardian info
+      guardian: data.guardian,
+
+      // Conditionally map second guardian
+      secondGuardian: data.hasSecondGuardian === "Yes" ? data.secondGuardian : undefined,
+
+      // Set/override metadata and system-generated fields
+      programId: 1, // dummy
+      entryStatus: 1, // dummy
+      timestamp: new Date().toISOString(),
+      ip: "127.0.0.1", // dummy
+      key: "dummy-key", // dummy
+      lastupdated: new Date().toISOString(),
+      createdBy: "user", // dummy
+      updatedBy: "user", // dummy
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      await studentAPI.submitAdmission(admissionData);
+      setSubmitSuccess("Form submitted successfully! Your application is being reviewed.");
+      setSubmissionCompleted(true);
+    } catch (error) {
+      setSubmitError("An error occurred while submitting the form. Please try again.");
+      console.error("Submission error:", error);
+      setSubmissionCompleted(true);
+    }
+  };
+
   const watchedIndexNumber = watch("indexNumber");
   const watchedRegion = watch("region");
   const watchedDistrict = watch("district");
@@ -112,43 +173,24 @@ const StudentAdmissionForm = () => {
   const hasSecondGuardian = watch("hasSecondGuardian");
   const healthConditions = watch("healthConditions");
 
-  // Effect to fetch student data when index number changes
   useEffect(() => {
-    const fetchData = async () => {
-      if (watchedIndexNumber && watchedIndexNumber.length > 5) {
-        setIsLoading(true);
-        try {
-          const data = await fetchStudentData(watchedIndexNumber);
-          
-          // Set values from API
-          if (data.fullName) setValue("fullName", data.fullName);
-          if (data.gender) setValue("gender", data.gender);
-          if (data.program) setValue("program", data.program);
-          if (data.track) setValue("track", data.track);
-          if (data.status) setValue("status", data.status);
-          if (data.dateOfEnrolment) setValue("dateOfEnrolment", data.dateOfEnrolment);
-          
-          clearErrors(["fullName", "gender", "program", "track", "status", "dateOfEnrolment"]);
-        } catch (error) {
-          setError("indexNumber", { 
-            type: "manual", 
-            message: "Failed to fetch student data. Please check the index number." 
-          });
-        } finally {
-          setIsLoading(false);
-        }
+    const fetchLocations = async () => {
+      try {
+        const locationData = await studentAPI.getLocations();
+        setRegions(locationData.regions);
+      } catch (error) {
+        console.error("Failed to fetch locations:", error);
       }
     };
-
-    fetchData();
-  }, [watchedIndexNumber, setValue, setError, clearErrors]);
+    fetchLocations();
+  }, []);
 
   // Effect to update districts when region changes
   useEffect(() => {
     if (watchedRegion) {
-      const region = ghanaLocationData.regions.find(r => r.name === watchedRegion);
+      const region = regions.find(r => r.name === watchedRegion);
       if (region) {
-        const districtNames = region.districts.map(d => d.name);
+        const districtNames = region.districts.map((d: { name: any; }) => d.name);
         setDistricts(districtNames);
         setValue("district", "");
         setValue("homeTown", "");
@@ -164,14 +206,14 @@ const StudentAdmissionForm = () => {
       setTowns([]);
       setSchools([]);
     }
-  }, [watchedRegion, setValue]);
+  }, [watchedRegion, setValue, regions]);
 
   // Effect to update towns when district changes
   useEffect(() => {
     if (watchedRegion && watchedDistrict) {
-      const region = ghanaLocationData.regions.find(r => r.name === watchedRegion);
+      const region = regions.find(r => r.name === watchedRegion);
       if (region) {
-        const district = region.districts.find(d => d.name === watchedDistrict);
+        const district = region.districts.find((d: { name: string; }) => d.name === watchedDistrict);
         if (district) {
           setTowns(district.towns);
           setValue("homeTown", "");
@@ -185,32 +227,59 @@ const StudentAdmissionForm = () => {
       setValue("school", "");
       setSchools([]);
     }
-  }, [watchedDistrict, watchedRegion, setValue]);
+  }, [watchedDistrict, watchedRegion, setValue, regions]);
 
   // Effect to update schools when home town changes
   useEffect(() => {
-    if (watchedHomeTown) {
-      // Use mock schools data or fallback to generic names
-      const mockSchools = schoolsData[watchedHomeTown] || [
-        `${watchedHomeTown} Senior High School`,
-        `${watchedHomeTown} Technical School`,
-        `${watchedHomeTown} Grammar School`,
-        `${watchedHomeTown} Academy`,
-        `${watchedHomeTown} College`
-      ];
-      setSchools(mockSchools);
-      setValue("school", "");
-    } else {
-      setSchools([]);
-      setValue("school", "");
-    }
+    const fetchSchools = async () => {
+      if (watchedHomeTown) {
+        try {
+          const schoolData = await studentAPI.getSchoolsByTown(watchedHomeTown);
+          setSchools(schoolData.map((s: any) => s.name));
+          setValue("school", "");
+        } catch (error) {
+          console.error("Failed to fetch schools:", error);
+          setSchools([]);
+        }
+      } else {
+        setSchools([]);
+        setValue("school", "");
+      }
+    };
+    fetchSchools();
   }, [watchedHomeTown, setValue]);
 
-  const onSubmit = async (data: StudentFormData) => {
-    console.log("Form submitted:", data);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    alert("Admission form submitted successfully!");
-  };
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      if (watchedIndexNumber && watchedIndexNumber.length > 5) { // Example validation
+        try {
+          const studentData = await studentAPI.getStudentByIndex(watchedIndexNumber);
+          // Pre-fill form with student data
+          setValue("name", studentData.name);
+          setValue("gender", studentData.gender);
+          setValue("dateOfBirth", studentData.dateOfBirth);
+          setValue("placeOfBirth", studentData.placeOfBirth);
+          setValue("region", studentData.region);
+          setValue("district", studentData.district);
+          setValue("homeTown", studentData.homeTown);
+          setValue("address", studentData.address);
+          setValue("religion", studentData.religion);
+          setValue("track", studentData.track);
+          setValue("status", studentData.status as "PENDING" | "APPROVED" | "REJECTED");
+          setValue("dateOfEnrolment", studentData.dateOfEnrolment);
+          setValue("ghanaCardNo", studentData.ghanaCardNo);
+          setValue("nhis", studentData.nhis);
+          setValue("jhsCompleted", studentData.jhsCompleted);
+          setValue("sports", studentData.sports);
+          setValue("healthConditions", studentData.healthConditions as "Yes" | "No");
+          setValue("school", studentData.school);
+        } catch (error) {
+          console.error("Failed to fetch student data:", error);
+        }
+      }
+    };
+    fetchStudentData();
+  }, [watchedIndexNumber, setValue]);
 
   const nextSection = () => {
     setCurrentSection(prev => prev + 1);
@@ -220,6 +289,14 @@ const StudentAdmissionForm = () => {
   const prevSection = () => {
     setCurrentSection(prev => prev - 1);
     window.scrollTo(0, 0);
+  };
+
+  const handleReset = () => {
+    reset(); // from useForm
+    setCurrentSection(1);
+    setSubmissionCompleted(false);
+    setSubmitError(null);
+    setSubmitSuccess(null);
   };
 
   // Render Section 1: Student Bio
@@ -262,18 +339,18 @@ const StudentAdmissionForm = () => {
 
         {/* Full Name */}
         <div className="form-group">
-          <label htmlFor="fullName" className="block text-sm font-medium mb-1">
+          <label htmlFor="name" className="block text-sm font-medium mb-1">
             Full Name *
           </label>
           <input
-            id="fullName"
+            id="name"
             type="text"
-            className={`w-full p-2 border rounded-md ${errors.fullName ? 'border-red-500' : 'border-gray-300'} bg-gray-100`}
-            {...register("fullName")}
+            className={`w-full p-2 border rounded-md ${errors.name ? 'border-red-500' : 'border-gray-300'} bg-gray-100`}
+            {...register("name")}
             disabled
           />
-          {errors.fullName && (
-            <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
           )}
         </div>
 
@@ -282,13 +359,16 @@ const StudentAdmissionForm = () => {
           <label htmlFor="gender" className="block text-sm font-medium mb-1">
             Gender *
           </label>
-          <input
+          <select
             id="gender"
-            type="text"
-            className={`w-full p-2 border rounded-md ${errors.gender ? 'border-red-500' : 'border-gray-300'} bg-gray-100`}
+            className={`w-full p-2 border rounded-md ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
             {...register("gender")}
-            disabled
-          />
+          >
+            <option value="">Select Gender</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
           {errors.gender && (
             <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>
           )}
@@ -337,7 +417,7 @@ const StudentAdmissionForm = () => {
             {...register("region")}
           >
             <option value="">Select Region</option>
-            {ghanaLocationData.regions.map(region => (
+            {regions.map(region => (
               <option key={region.name} value={region.name}>{region.name}</option>
             ))}
           </select>
@@ -459,22 +539,7 @@ const StudentAdmissionForm = () => {
           )}
         </div>
 
-        {/* Program */}
-        <div className="form-group">
-          <label htmlFor="program" className="block text-sm font-medium mb-1">
-            Program *
-          </label>
-          <input
-            id="program"
-            type="text"
-            className={`w-full p-2 border rounded-md ${errors.program ? 'border-red-500' : 'border-gray-300'} bg-gray-100`}
-            {...register("program")}
-            disabled
-          />
-          {errors.program && (
-            <p className="text-red-500 text-xs mt-1">{errors.program.message}</p>
-          )}
-        </div>
+
 
         {/* Track */}
         <div className="form-group">
@@ -498,13 +563,16 @@ const StudentAdmissionForm = () => {
           <label htmlFor="status" className="block text-sm font-medium mb-1">
             Status *
           </label>
-          <input
+          <select
             id="status"
-            type="text"
-            className={`w-full p-2 border rounded-md ${errors.status ? 'border-red-500' : 'border-gray-300'} bg-gray-100`}
+            className={`w-full p-2 border rounded-md ${errors.status ? 'border-red-500' : 'border-gray-300'}`}
             {...register("status")}
-            disabled
-          />
+          >
+            <option value="">Select Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
           {errors.status && (
             <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>
           )}
@@ -554,7 +622,7 @@ const StudentAdmissionForm = () => {
         </div>
 
         {/* JHS Completed */}
-        {/* <div className="form-group">
+        <div className="form-group">
           <label htmlFor="jhsCompleted" className="block text-sm font-medium mb-1">
             JHS Completed *
           </label>
@@ -570,7 +638,7 @@ const StudentAdmissionForm = () => {
           {errors.jhsCompleted && (
             <p className="text-red-500 text-xs mt-1">{errors.jhsCompleted.message}</p>
           )}
-        </div> */}
+        </div>
 
         {/* Sports */}
         <div className="form-group">
@@ -683,8 +751,9 @@ const StudentAdmissionForm = () => {
             {...register("guardian.gender")}
           >
             <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
           </select>
           {errors.guardian?.gender && (
             <p className="text-red-500 text-xs mt-1">{errors.guardian.gender.message}</p>
@@ -760,60 +829,12 @@ const StudentAdmissionForm = () => {
               <input
                 id="secondGuardian.firstName"
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className={`w-full p-2 border rounded-md ${errors.secondGuardian?.firstName ? 'border-red-500' : 'border-gray-300'}`}
                 {...register("secondGuardian.firstName")}
               />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="secondGuardian.middleName" className="block text-sm font-medium mb-1">
-                Middle Name
-              </label>
-              <input
-                id="secondGuardian.middleName"
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                {...register("secondGuardian.middleName")}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="secondGuardian.lastName" className="block text-sm font-medium mb-1">
-                Last Name
-              </label>
-              <input
-                id="secondGuardian.lastName"
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                {...register("secondGuardian.lastName")}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="secondGuardian.gender" className="block text-sm font-medium mb-1">
-                Gender
-              </label>
-              <select
-                id="secondGuardian.gender"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                {...register("secondGuardian.gender")}
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="secondGuardian.occupation" className="block text-sm font-medium mb-1">
-                Occupation
-              </label>
-              <input
-                id="secondGuardian.occupation"
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                {...register("secondGuardian.occupation")}
-              />
+              {errors.secondGuardian?.firstName && (
+                <p className="text-red-500 text-xs mt-1">{errors.secondGuardian.firstName.message}</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -822,22 +843,13 @@ const StudentAdmissionForm = () => {
               </label>
               <input
                 id="secondGuardian.phone"
-                type="tel"
-                className="w-full p-2 border border-gray-300 rounded-md"
+                type="text"
+                className={`w-full p-2 border rounded-md ${errors.secondGuardian?.phone ? 'border-red-500' : 'border-gray-300'}`}
                 {...register("secondGuardian.phone")}
               />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="secondGuardian.email" className="block text-sm font-medium mb-1">
-                Email
-              </label>
-              <input
-                id="secondGuardian.email"
-                type="email"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                {...register("secondGuardian.email")}
-              />
+              {errors.secondGuardian?.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.secondGuardian.phone.message}</p>
+              )}
             </div>
           </div>
         </div>
@@ -875,7 +887,7 @@ const StudentAdmissionForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div><strong>Index Number:</strong> {formData.indexNumber}</div>
             <div><strong>Enrolment Code:</strong> {formData.enrolmentCode}</div>
-            <div><strong>Full Name:</strong> {formData.fullName}</div>
+            <div><strong>Full Name:</strong> {formData.name}</div>
             <div><strong>Gender:</strong> {formData.gender}</div>
             <div><strong>Date of Birth:</strong> {formData.dateOfBirth}</div>
             <div><strong>Place of Birth:</strong> {formData.placeOfBirth}</div>
@@ -884,7 +896,7 @@ const StudentAdmissionForm = () => {
             <div><strong>Home Town:</strong> {formData.homeTown}</div>
             <div><strong>Address:</strong> {formData.address || "N/A"}</div>
             <div><strong>Religion:</strong> {formData.religion}</div>
-            <div><strong>Program:</strong> {formData.program}</div>
+
             <div><strong>Track:</strong> {formData.track}</div>
             <div><strong>Status:</strong> {formData.status}</div>
             <div><strong>Date of Enrolment:</strong> {formData.dateOfEnrolment}</div>
@@ -902,6 +914,7 @@ const StudentAdmissionForm = () => {
             <div><strong>Middle Name:</strong> {formData.guardian?.middleName || "N/A"}</div>
             <div><strong>Last Name:</strong> {formData.guardian?.lastName}</div>
             <div><strong>Gender:</strong> {formData.guardian?.gender}</div>
+            <div><strong>Relationship:</strong> {formData.guardian?.relationship}</div>
             <div><strong>Occupation:</strong> {formData.guardian?.occupation}</div>
             <div><strong>Phone:</strong> {formData.guardian?.phone}</div>
             <div><strong>Email:</strong> {formData.guardian?.email || "N/A"}</div>
@@ -911,13 +924,8 @@ const StudentAdmissionForm = () => {
             <>
               <h3 className="text-lg font-medium mb-4 border-b pb-2">Second Guardian Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div><strong>First Name:</strong> {formData.secondGuardian.firstName || "N/A"}</div>
-                <div><strong>Middle Name:</strong> {formData.secondGuardian.middleName || "N/A"}</div>
-                <div><strong>Last Name:</strong> {formData.secondGuardian.lastName || "N/A"}</div>
-                <div><strong>Gender:</strong> {formData.secondGuardian.gender || "N/A"}</div>
-                <div><strong>Occupation:</strong> {formData.secondGuardian.occupation || "N/A"}</div>
-                <div><strong>Phone:</strong> {formData.secondGuardian.phone || "N/A"}</div>
-                <div><strong>Email:</strong> {formData.secondGuardian.email || "N/A"}</div>
+                <div><strong>First Name:</strong> {formData.secondGuardian?.firstName || "N/A"}</div>
+                <div><strong>Phone:</strong> {formData.secondGuardian?.phone || "N/A"}</div>
               </div>
             </>
           )}
@@ -937,6 +945,8 @@ const StudentAdmissionForm = () => {
         {errors.certified && (
           <p className="text-red-500 text-xs mt-1">{errors.certified.message}</p>
         )}
+
+        {/* Moved submission messages to the thank you screen */}
         
         <div className="flex justify-between mt-6">
           <button
@@ -965,7 +975,8 @@ const StudentAdmissionForm = () => {
             </button>
             
             <button
-              type="reset"
+              type="button"
+              onClick={handleReset}
               className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
             >
               Reset
@@ -975,6 +986,42 @@ const StudentAdmissionForm = () => {
       </div>
     );
   };
+
+  // const handleReset = () => {
+  //   reset(); // from useForm
+  //   setCurrentSection(1);
+  //   setSubmissionCompleted(false);
+  //   setSubmitError(null);
+  //   setSubmitSuccess(null);
+  // };
+
+  const renderThankYou = () => (
+    <div className="text-center py-10">
+      {submitSuccess && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-green-600 mb-2">Submission Successful!</h2>
+          <p className="text-gray-700">{submitSuccess}</p>
+        </div>
+      )}
+      {submitError && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Submission Failed</h2>
+          <p className="text-gray-700">{submitError}</p>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => {
+          setSubmissionCompleted(false);
+          setCurrentSection(1);
+          // You might want to reset the form here as well
+        }}
+        className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+      >
+        Start New Application
+      </button>
+    </div>
+  );
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
@@ -1011,17 +1058,18 @@ const StudentAdmissionForm = () => {
         </div>
         
         <form onSubmit={handleSubmit(onSubmit)}>
-          {currentSection === 1 && renderSection1()}
-          {currentSection === 2 && renderSection2()}
-          {currentSection === 3 && renderSection3()}
+          {submissionCompleted ? (
+            renderThankYou()
+          ) : (
+            <>
+              {currentSection === 1 && renderSection1()}
+              {currentSection === 2 && renderSection2()}
+              {currentSection === 3 && renderSection3()}
+            </>
+          )}
         </form>
       </div>
       
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-md">Loading student data...</div>
-        </div>
-      )}
     </div>
   );
 };
