@@ -204,9 +204,8 @@ const SchoolRegistration = () => {
               }}
               onClose={() => setIsModalOpen(false)}
               onConfirm={() => {
-                // Add your confirm logic here, e.g., navigate to the next step
                 setIsModalOpen(false);
-                // router.push('/next-step'); // Uncomment and set the correct route if needed
+                 router.push('/payment');
               }}
             />
           )}

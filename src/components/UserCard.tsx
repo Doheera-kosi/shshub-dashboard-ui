@@ -95,7 +95,7 @@ const UserCard = ({ type }: { type: string }) => {
       {/* <h1 className="text-2xl font-semibold my-4">1234</h1> */}
       <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold text-gray-900">
-          {type === "Fund" ? `$${formatNumber(cardData.value)}` : cardData.value}
+          {type === "Fund" ? `GH₵ ${formatNumber(cardData.value)}` : cardData.value}
         </h1>
         <Image src="/more.png" alt="" width={24} height={24} />
       </div>
@@ -216,7 +216,7 @@ const UserCard = ({ type }: { type: string }) => {
       {type === "Fund" && (
         <div className="mt-4">
           <div className="flex justify-between items-center text-xs mb-1">
-                        <span className="text-gray-500">Target: ${formatNumber(cardData.target)}</span>
+                        <span className="text-gray-500">Target: GH₵ {formatNumber(cardData.target)}</span>
             <div className="flex items-center text-green-600">
               <TrendingUp size={14} className="mr-1" />
               <span>{cardData.trend}%</span>
