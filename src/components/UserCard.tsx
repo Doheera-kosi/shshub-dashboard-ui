@@ -84,11 +84,11 @@ const UserCard = ({ type }: { type: string }) => {
     <div className="rounded-2xl shadow-sm bg-white p-4 flex-1 min-w-[130px]">
       <div className="flex justify-between items-center mb-4">
         <h2 className="capitalize text-sm font-medium text-gray-500">{type}s</h2>
-        <span className="text-[10px] bg-purple-100 p-2 rounded-full text-purple-600">
-          {type === "Application" && <FileText size={24} className="text-purple-600" />}
-          {type === "Admission" && <GraduationCap size={24} className="text-purple-600" />}
-          {type === "Accommodation" && <Bed size={24} className="text-purple-600" />}
-          {type === "Fund" && <Wallet size={24} className="text-purple-600" />}
+        <span className="text-[10px] bg-blue-100 p-2 rounded-full text-blue-600">
+          {type === "Application" && <FileText size={24} className="text-blue-600" />}
+          {type === "Admission" && <GraduationCap size={24} className="text-blue-600" />}
+          {type === "Accommodation" && <Bed size={24} className="text-blue-600" />}
+          {type === "Fund" && <Wallet size={24} className="text-blue-600" />}
         </span>
         {/* <Image src="/more.png" alt="" width={20} height={20} /> */}
       </div>

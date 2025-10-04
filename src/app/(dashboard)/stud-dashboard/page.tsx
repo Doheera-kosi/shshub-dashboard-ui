@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 
 
-import { InfoCard, ProgressTracker, SchoolCategoryChart, SchoolFeesCard, Recommendations } from "@/components/StudentDashboardComponents";
-import { CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
+import { InfoCard, ProgressTracker, SchoolCategoryChart, SchoolFeesCard } from "@/components/StudentDashboardComponents";
+import { CheckCircle, Clock, XCircle, TrendingUp, BookCopy, PencilLine } from 'lucide-react';
+import AnnouncementsAndEvents from "@/components/AnnouncementsAndEvents";
 
 const sparklineData = [
   { value: 50 },
@@ -27,30 +28,29 @@ const StudentDashboardPage = () => {
       {/* Row 1: Quick Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <InfoCard 
-          title="Schools Applied To" 
-          value="6"
-          icon={<TrendingUp className="text-[#C084FC]" />} 
-          sparklineData={sparklineData}
-          color="#C084FC"
-        />
-        <InfoCard 
-          title="Accepted"
-          value="1"
+          title="Terms Completed"
+          value="1 of 9"
           icon={<CheckCircle className="text-[#A8E6A1]" />} 
-          trend="+1 this week"
           color="#A8E6A1"
         />
         <InfoCard 
-          title="Pending"
+          title="Pending Assignments" 
+          value="6"
+          icon={<BookCopy className="text-blue-500" />} 
+          color="#3B82F6"
+        />
+        
+        <InfoCard 
+          title="Online Quizzes"
           value="4"
-          icon={<Clock className="text-[#FAE27C]" />} 
-          color="#FAE27C"
+          icon={<PencilLine className="text-blue-300" />} 
+          color="#93C5FD"
         />
         <InfoCard 
-          title="Declined"
+          title="Upcoming Events"
           value="1"
-          icon={<XCircle className="text-[#F7A6A6]" />} 
-          color="#F7A6A6"
+          icon={<Clock className="text-[#FAE27C]" />} 
+          color="#FAE27C"
         />
       </div>
 
@@ -61,13 +61,8 @@ const StudentDashboardPage = () => {
 
       {/* Row 3: School Selection Insights */}
       <div className="flex flex-col lg:flex-row gap-8 mb-8">
-        <SchoolCategoryChart />
-        <SchoolFeesCard />
-      </div>
-
-      {/* Row 4: Recommended Actions */}
-      <div>
-        <Recommendations />
+        <AnnouncementsAndEvents />
+        {/* <SchoolFeesCard /> */}
       </div>
     </div>
   );

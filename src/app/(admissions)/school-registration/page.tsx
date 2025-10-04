@@ -136,13 +136,13 @@ const SchoolRegistration = () => {
   return (
         <div className="">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-blue-700">Welcome to the Admission Registration Portal</h1>
+            <h1 className="text-4xl font-bold mb-2 text-blue-600">Welcome to the Admission Registration Portal</h1>
             <p className="text-gray-700 my-6">
               We’ve made it simple for you to begin your admission process. Just select your Region and District, then search for your assigned school. Enter your Index Number to verify your placement, and once confirmed, hit Proceed to continue with your admission form.
             </p>
           </div>
           
-          <div className="relative z-20 bg-blue-600 backdrop-blur-sm p-4 rounded-2xl shadow-sm mb-8">
+          <div className="relative z-20 bg-blue-500 backdrop-blur-sm p-4 rounded-2xl shadow-sm mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <CustomSelect
                 value={selectedRegion}
@@ -187,7 +187,7 @@ const SchoolRegistration = () => {
                         <button onClick={() => {
                           setSelectedSchool(school);
                           setIsModalOpen(true);
-                        }} className="bg-gray-400 text-white py-2 px-6 rounded-full shadow-md hover:bg-blue-600 transition-transform duration-300 transform hover:scale-105">
+                        }} className="bg-gray-400 text-white py-2 px-6 rounded-full shadow-md hover:bg-blue-500 transition-transform duration-300 transform hover:scale-105">
                             start here
                         </button>
                     </div>

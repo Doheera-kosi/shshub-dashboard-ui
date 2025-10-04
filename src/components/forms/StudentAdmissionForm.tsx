@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ghanaLocationData, schoolsData } from '@/lib/ghanaData';
+import { useRouter } from 'next/navigation';
 
 // Complete schema with all fields
 const studentFormSchema = z.object({
@@ -88,6 +89,7 @@ const StudentAdmissionForm = () => {
   const [towns, setTowns] = useState<string[]>([]);
   const [schools, setSchools] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -208,6 +210,7 @@ const StudentAdmissionForm = () => {
 
   const onSubmit = async (data: StudentFormData) => {
     console.log("Form submitted:", data);
+    router.push('/stud-dashboard');
     await new Promise(resolve => setTimeout(resolve, 1000));
     alert("Admission form submitted successfully!");
   };
