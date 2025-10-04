@@ -253,12 +253,7 @@ const StudentAdmissionForm = () => {
     fetchSchools();
   }, [watchedHomeTown, setValue]);
 
-  const onSubmit = async (data: StudentFormData) => {
-    console.log("Form submitted:", data);
-    router.push('/stud-dashboard');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    alert("Admission form submitted successfully!");
-  };
+
 
   const nextSection = () => {
     setCurrentSection(prev => prev + 1);
