@@ -27,11 +27,23 @@ const Menu = () => {
     {
       title: "MENU",
       items: [
-        {
+        /* {
           icon: "/home.png",
           label: "Home",
           href: "/",
           visible: ["admin", "teacher", "student", "parent"],
+        }, */
+        {
+          icon: "/home.png",
+          label: "Home",
+          href: "/stud-dashboard",
+          visible: ["student"],
+        },
+        {
+          icon: "/home.png",
+          label: "Home",
+          href: "/admin",
+          visible: ["admin"],
         },
         {
           icon: "/teacher.png",
@@ -143,7 +155,13 @@ const Menu = () => {
           icon: "/setting.png",
           label: "Settings",
           href: "/settings",
-          visible: ["admin", "teacher", "student", "parent"],
+          visible: ["teacher", "student", "parent"],
+        },
+        {
+          icon: "/setting.png",
+          label: "Settings",
+          href: "/admin/settings",
+          visible: ["admin"],
         },
         {
           icon: "/logout.png",

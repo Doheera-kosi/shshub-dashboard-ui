@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { ghanaLocationData, schoolsData } from '@/lib/ghanaData';
+import { useRouter } from 'next/navigation';
 import { studentAPI, StudentAdmissionData } from '../../services/api';
 
 // Complete schema with all fields
@@ -85,6 +87,8 @@ const StudentAdmissionForm = () => {
   const [districts, setDistricts] = useState<string[]>([]);
   const [towns, setTowns] = useState<string[]>([]);
   const [schools, setSchools] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [submissionCompleted, setSubmissionCompleted] = useState(false);
@@ -249,37 +253,12 @@ const StudentAdmissionForm = () => {
     fetchSchools();
   }, [watchedHomeTown, setValue]);
 
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      if (watchedIndexNumber && watchedIndexNumber.length > 5) { // Example validation
-        try {
-          const studentData = await studentAPI.getStudentByIndex(watchedIndexNumber);
-          // Pre-fill form with student data
-          setValue("name", studentData.name);
-          setValue("gender", studentData.gender);
-          setValue("dateOfBirth", studentData.dateOfBirth);
-          setValue("placeOfBirth", studentData.placeOfBirth);
-          setValue("region", studentData.region);
-          setValue("district", studentData.district);
-          setValue("homeTown", studentData.homeTown);
-          setValue("address", studentData.address);
-          setValue("religion", studentData.religion);
-          setValue("track", studentData.track);
-          setValue("status", studentData.status as "PENDING" | "APPROVED" | "REJECTED");
-          setValue("dateOfEnrolment", studentData.dateOfEnrolment);
-          setValue("ghanaCardNo", studentData.ghanaCardNo);
-          setValue("nhis", studentData.nhis);
-          setValue("jhsCompleted", studentData.jhsCompleted);
-          setValue("sports", studentData.sports);
-          setValue("healthConditions", studentData.healthConditions as "Yes" | "No");
-          setValue("school", studentData.school);
-        } catch (error) {
-          console.error("Failed to fetch student data:", error);
-        }
-      }
-    };
-    fetchStudentData();
-  }, [watchedIndexNumber, setValue]);
+  const onSubmit = async (data: StudentFormData) => {
+    console.log("Form submitted:", data);
+    router.push('/stud-dashboard');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    alert("Admission form submitted successfully!");
+  };
 
   const nextSection = () => {
     setCurrentSection(prev => prev + 1);

@@ -180,20 +180,5 @@ const SchoolFeesCard = () => {
   );
 };
 
-const Recommendations = () => {
-  return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">Recommended Actions</h3>
-      <ul className="space-y-3">
-        <li className="text-sm text-gray-700">You have applied to 2 Category A schools. Consider applying to Category B for higher chances.</li>
-        <li className="text-sm text-gray-700">Your profile is verified, but you haven’t selected any Category D schools yet.</li>
-      </ul>
-      <div className="flex space-x-4 mt-4">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">Apply to More Schools</button>
-        <button className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold">Edit Profile</button>
-      </div>
-    </div>
-  );
-};
 
-export { InfoCard, ProgressTracker, SchoolCategoryChart, SchoolFeesCard, Recommendations };
+export { InfoCard, ProgressTracker, SchoolCategoryChart, SchoolFeesCard };

@@ -84,18 +84,18 @@ const UserCard = ({ type }: { type: string }) => {
     <div className="rounded-2xl shadow-sm bg-white p-4 flex-1 min-w-[130px]">
       <div className="flex justify-between items-center mb-4">
         <h2 className="capitalize text-sm font-medium text-gray-500">{type}s</h2>
-        <span className="text-[10px] bg-purple-100 p-2 rounded-full text-purple-600">
-          {type === "Application" && <FileText size={24} className="text-purple-600" />}
-          {type === "Admission" && <GraduationCap size={24} className="text-purple-600" />}
-          {type === "Accommodation" && <Bed size={24} className="text-purple-600" />}
-          {type === "Fund" && <Wallet size={24} className="text-purple-600" />}
+        <span className="text-[10px] bg-blue-100 p-2 rounded-full text-blue-600">
+          {type === "Application" && <FileText size={24} className="text-blue-600" />}
+          {type === "Admission" && <GraduationCap size={24} className="text-blue-600" />}
+          {type === "Accommodation" && <Bed size={24} className="text-blue-600" />}
+          {type === "Fund" && <Wallet size={24} className="text-blue-600" />}
         </span>
         {/* <Image src="/more.png" alt="" width={20} height={20} /> */}
       </div>
       {/* <h1 className="text-2xl font-semibold my-4">1234</h1> */}
       <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold text-gray-900">
-          {type === "Fund" ? `$${formatNumber(cardData.value)}` : cardData.value}
+          {type === "Fund" ? `GH₵ ${formatNumber(cardData.value)}` : cardData.value}
         </h1>
         <Image src="/more.png" alt="" width={24} height={24} />
       </div>
@@ -216,7 +216,7 @@ const UserCard = ({ type }: { type: string }) => {
       {type === "Fund" && (
         <div className="mt-4">
           <div className="flex justify-between items-center text-xs mb-1">
-                        <span className="text-gray-500">Target: ${formatNumber(cardData.target)}</span>
+                        <span className="text-gray-500">Target: GH₵ {formatNumber(cardData.target)}</span>
             <div className="flex items-center text-green-600">
               <TrendingUp size={14} className="mr-1" />
               <span>{cardData.trend}%</span>
