@@ -1,8 +1,11 @@
 'use client';
 
 import { Users, Map, Shield } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const UserManagement = () => {
+  const router = useRouter();
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
       <h2 className="text-lg font-semibold mb-4">User Management</h2>
@@ -15,7 +18,7 @@ const UserManagement = () => {
               <p className="text-sm text-gray-500">50</p>
             </div>
           </div>
-          <button className="bg-purple-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
+          <button onClick={() => router.push('/super-admin/users')} className="bg-purple-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
         </div>
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
