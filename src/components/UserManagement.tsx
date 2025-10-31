@@ -56,7 +56,12 @@ const UserManagement = () => {
               <p className="text-sm text-gray-500">{regionCount > 0 ? regionCount : 'No regions yet'}</p>
             </div>
           </div>
-          <button className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
+          <button
+            className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm"
+            onClick={() => router.push('/super-admin/regions')}
+          >
+            Manage
+          </button>
         </div>
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">

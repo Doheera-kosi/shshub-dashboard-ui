@@ -11,3 +11,13 @@ export const getAllRegions = async () => {
     throw error;
   }
 };
+
+export const createRegion = async (regionData: { name: string }) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/regions`, regionData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating region:', error);
+    throw error;
+  }
+};
