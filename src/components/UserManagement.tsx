@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, Map, School } from 'lucide-react';
+import { Users, Map, Shield } from 'lucide-react';
 
 const UserManagement = () => {
   return (
@@ -9,20 +9,30 @@ const UserManagement = () => {
       <div className="grid grid-cols-1 gap-4">
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
-            <School size={24} className="text-blue-500 mr-3" />
+            <Shield size={24} className="text-purple-500 mr-3" />
             <div>
-              <h3 className="text-md font-semibold">Schools</h3>
-              <p className="text-sm text-gray-500">1,000</p>
+              <h3 className="text-md font-semibold">Users</h3>
+              <p className="text-sm text-gray-500">50</p>
+            </div>
+          </div>
+          <button className="bg-purple-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
+        </div>
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center">
+            <Map size={24} className="text-blue-500 mr-3" />
+            <div>
+              <h3 className="text-md font-semibold">Regions</h3>
+              <p className="text-sm text-gray-500">16</p>
             </div>
           </div>
           <button className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
         </div>
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
-            <Map size={24} className="text-green-500 mr-3" />
+            <Users size={24} className="text-green-500 mr-3" />
             <div>
-              <h3 className="text-md font-semibold">Zones</h3>
-              <p className="text-sm text-gray-500">10</p>
+              <h3 className="text-md font-semibold">Districts</h3>
+              <p className="text-sm text-gray-500">275</p>
             </div>
           </div>
           <button className="bg-green-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
