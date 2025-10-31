@@ -4,10 +4,12 @@ import { Users, Map, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getAllStudents } from '@/services/studentService';
+import { getAllRegions } from '@/services/regionService';
 
 const UserManagement = () => {
   const router = useRouter();
   const [studentCount, setStudentCount] = useState(0);
+  const [regionCount, setRegionCount] = useState(0);
 
   useEffect(() => {
     const fetchStudentCount = async () => {
@@ -19,7 +21,17 @@ const UserManagement = () => {
       }
     };
 
+    const fetchRegionCount = async () => {
+      try {
+        const regions = await getAllRegions();
+        setRegionCount(regions.length);
+      } catch (error) {
+        console.error('Failed to fetch regions', error);
+      }
+    };
+
     fetchStudentCount();
+    fetchRegionCount();
   }, []);
 
   return (
@@ -41,7 +53,7 @@ const UserManagement = () => {
             <Map size={24} className="text-blue-500 mr-3" />
             <div>
               <h3 className="text-md font-semibold">Regions</h3>
-              <p className="text-sm text-gray-500">16</p>
+              <p className="text-sm text-gray-500">{regionCount > 0 ? regionCount : 'No regions yet'}</p>
             </div>
           </div>
           <button className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
