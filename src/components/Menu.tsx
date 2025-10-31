@@ -36,7 +36,7 @@ const Menu = () => {
         {
           icon: "/home.png",
           label: "Home",
-          href: "/stud-dashboard",
+          href: "/student-dashboard",
           visible: ["student"],
         },
         {
@@ -48,13 +48,13 @@ const Menu = () => {
         {
           icon: "/teacher.png",
           label: "Teachers",
-          href: "/list/teachers",
+          href: "/list/management/teachers",
           visible: ["admin", "teacher"],
         },
         {
           icon: "/student.png",
           label: "Students",
-          href: "/list/students",
+          href: "/list/management/students",
           visible: ["admin", "teacher"],
         },
         {
@@ -66,43 +66,43 @@ const Menu = () => {
         {
           icon: "/parent.png",
           label: "Parents",
-          href: "/list/parents",
+          href: "/list/management/parents",
           visible: ["admin", "teacher"],
         },
         {
           icon: "/subject.png",
           label: "Subjects",
-          href: "/list/subjects",
+          href: "/list/academics/subjects",
           visible: ["admin"],
         },
         {
           icon: "/class.png",
           label: "Classes",
-          href: "/list/classes",
+          href: "/list/academics/classes",
           visible: ["admin", "teacher"],
         },
         {
           icon: "/lesson.png",
           label: "Lessons",
-          href: "/list/lessons",
+          href: "/list/academics/lessons",
           visible: ["admin", "teacher"],
         },
         {
           icon: "/exam.png",
           label: "Exams",
-          href: "/list/exams",
+          href: "/list/academics/exams",
           visible: ["teacher", "student"],
         },
         {
           icon: "/assignment.png",
           label: "Assignments",
-          href: "/list/assignments",
+          href: "/list/academics/assignments",
           visible: ["teacher", "student", "parent"],
         },
         {
           icon: "/result.png",
           label: "Results",
-          href: "/list/results",
+          href: "/list/academics/results",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
@@ -114,19 +114,19 @@ const Menu = () => {
         {
           icon: "/calendar.png",
           label: "Events",
-          href: "/list/events",
+          href: "/list/communications/events",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
           icon: "/message.png",
           label: "Messages",
-          href: "/list/messages",
+          href: "/list/communications/messages",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
           icon: "/announcement.png",
           label: "Announcements",
-          href: "/list/announcements",
+          href: "/list/communications/announcements",
           visible: ["teacher", "student", "parent"],
         },
       ],
@@ -168,6 +168,12 @@ const Menu = () => {
           label: "Logout",
           href: "/logout",
           visible: ["admin", "teacher", "student", "parent"],
+        },
+        {
+          icon: "/admin.png",
+          label: "Super Admin",
+          href: "/super-admin",
+          visible: ["admin"],
         },
       ],
     },
