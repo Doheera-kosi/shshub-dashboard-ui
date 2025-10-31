@@ -7,6 +7,10 @@ import {
   GraduationCap,
   Bed,
   Wallet,
+  Building,
+  Map,
+  Users,
+  Briefcase,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import ProgressBar from "./ProgressBar";
@@ -26,18 +30,38 @@ const UserCard = ({ type }: { type: string }) => {
       boarding: 300,
       day: 267,
     },
-    Accommodation: { 
-      value: 890, 
-      available: 450, 
-      total: 890, 
-      boys: { 
-        total: 342, 
-        occupied: 200 
+    Schools: {
+      value: 45,
+      new: 5,
+      pending: 10,
+    },
+    Zones: {
+      value: 12,
+      new: 2,
+      pending: 3,
+    },
+    Students: {
+      value: 120345,
+      new: 15000,
+      pending: 5000,
+    },
+    Teachers: {
+      value: 8765,
+      new: 500,
+      pending: 1200,
+    },
+    Accommodation: {
+      value: 890,
+      available: 450,
+      total: 890,
+      boys: {
+        total: 342,
+        occupied: 200
       },
-      girls: { 
-        total: 548, 
-        occupied: 240 
-      }, 
+      girls: {
+        total: 548,
+        occupied: 240
+      },
     },
         Fund: {
       value: 2500000,
@@ -89,6 +113,10 @@ const UserCard = ({ type }: { type: string }) => {
           {type === "Admission" && <GraduationCap size={24} className="text-blue-600" />}
           {type === "Accommodation" && <Bed size={24} className="text-blue-600" />}
           {type === "Fund" && <Wallet size={24} className="text-blue-600" />}
+          {type === "Schools" && <Building size={24} className="text-blue-600" />}
+          {type === "Zones" && <Map size={24} className="text-blue-600" />}
+          {type === "Students" && <Users size={24} className="text-blue-600" />}
+          {type === "Teachers" && <Briefcase size={24} className="text-blue-600" />}
         </span>
         {/* <Image src="/more.png" alt="" width={20} height={20} /> */}
       </div>
@@ -127,6 +155,20 @@ const UserCard = ({ type }: { type: string }) => {
                 <span className="text-green-600 font-bold">+15%</span> vs last
                 year
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+      {(type === "Schools" || type === "Zones" || type === "Students" || type === "Teachers") && (
+        <div className="mt-4">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center">
+              <span className="w-3 h-3 rounded-full bg-[#C3EBFA] mr-2"></span>
+              <span>New: {cardData.new}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-3 h-3 rounded-full bg-[#FAE27C] mr-2"></span>
+              <span>Pending: {cardData.pending}</span>
             </div>
           </div>
         </div>
