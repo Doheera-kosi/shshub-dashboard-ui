@@ -42,9 +42,9 @@ const NationalStats = () => {
         <div >
           <h3 className="text-md font-semibold mb-2">Regional Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={regionalData} layout="vertical" margin={{ top: 5, right: 20, left: 50, bottom: 5 }}>
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} />
+            <BarChart data={regionalData} margin={{ top: 5, right: 20, left: 20, bottom: 70 }}>
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" interval={0} />
+              <YAxis />
               <Tooltip />
               <Legend />
               <Bar dataKey="applicants" fill="#8884d8" />
