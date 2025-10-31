@@ -2,9 +2,25 @@
 
 import { Users, Map, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getAllStudents } from '@/services/studentService';
 
 const UserManagement = () => {
   const router = useRouter();
+  const [studentCount, setStudentCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStudentCount = async () => {
+      try {
+        const students = await getAllStudents();
+        setStudentCount(students.length);
+      } catch (error) {
+        console.error('Failed to fetch students', error);
+      }
+    };
+
+    fetchStudentCount();
+  }, []);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -39,6 +55,16 @@ const UserManagement = () => {
             </div>
           </div>
           <button className="bg-green-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
+        </div>
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center">
+            <Users size={24} className="text-yellow-500 mr-3" />
+            <div>
+              <h3 className="text-md font-semibold">Students</h3>
+              <p className="text-sm text-gray-500">{studentCount > 0 ? studentCount : 'No students yet'}</p>
+            </div>
+          </div>
+          <button onClick={() => router.push('/super-admin/students')} className="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
         </div>
       </div>
     </div>
