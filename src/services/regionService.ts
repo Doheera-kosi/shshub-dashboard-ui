@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://84.247.136.103/shshub/api/v1';
+import { BASE_API_URL } from './api';
 
 export const getAllRegions = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/regions`);
+    const response = await axios.get(`${BASE_API_URL}/regions`);
     return response.data;
   } catch (error) {
     console.error('Error fetching regions:', error);
@@ -14,10 +14,30 @@ export const getAllRegions = async () => {
 
 export const createRegion = async (regionData: { name: string }) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/regions`, regionData);
+    const response = await axios.post(`${BASE_API_URL}/regions`, regionData);
     return response.data;
   } catch (error) {
     console.error('Error creating region:', error);
+    throw error;
+  }
+};
+
+export const updateRegion = async (regionData: any) => {
+  try {
+    const response = await axios.put(`${BASE_API_URL}/regions`, regionData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating region:', error);
+    throw error;
+  }
+};
+
+export const deleteRegion = async (regionId: string) => {
+  try {
+    const response = await axios.delete(`${BASE_API_URL}/regions/${regionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting region:', error);
     throw error;
   }
 };

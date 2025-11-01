@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://84.247.136.103/api/v1';
+export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://84.247.136.103/shshub/api/v1/';
 
 export interface GuardianData {
   id?: number;
@@ -63,7 +63,7 @@ export interface StudentAdmissionData {
 export const studentAPI = {
   // Fetch student data by index number
   async getStudentByIndex(indexNumber: string) {
-    const response = await fetch(`${API_BASE_URL}/students/${indexNumber}`);
+    const response = await fetch(`${BASE_API_URL}/students/${indexNumber}`);
     if (!response.ok) {
       throw new Error('Failed to fetch student data');
     }
@@ -72,7 +72,7 @@ export const studentAPI = {
 
   // Submit admission form
   async submitAdmission(data: StudentAdmissionData) {
-    const response = await fetch(`${API_BASE_URL}/admissions`, {
+    const response = await fetch(`${BASE_API_URL}/admissions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export const studentAPI = {
 
   // Fetch locations (regions, districts, towns)
   async getLocations() {
-    const response = await fetch(`${API_BASE_URL}/locations`);
+    const response = await fetch(`${BASE_API_URL}/locations`);
     if (!response.ok) {
       throw new Error('Failed to fetch locations');
     }
@@ -99,7 +99,7 @@ export const studentAPI = {
 
   // Fetch schools by town
   async getSchoolsByTown(town: string) {
-    const response = await fetch(`${API_BASE_URL}/schools?town=${encodeURIComponent(town)}`);
+    const response = await fetch(`${BASE_API_URL}/schools?town=${encodeURIComponent(town)}`);
     if (!response.ok) {
       throw new Error('Failed to fetch schools');
     }
