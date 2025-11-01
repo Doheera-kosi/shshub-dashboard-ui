@@ -1,0 +1,124 @@
+
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import SuperAdminTable from '@/components/super-admin/SuperAdminTable';
+import CrudModal from '@/components/super-admin/CrudModal';
+import { getAllDistricts, addDistrict, updateDistrict, deleteDistrict } from '@/services/districtService';
+import { getAllRegions } from '@/services/regionService';
+
+const DistrictsPage = () => {
+  const [districts, setDistricts] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'create' | 'edit' | 'delete' | null>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
+
+  const fetchDistricts = async () => {
+    try {
+      const data = await getAllDistricts();
+      setDistricts(data);
+    } catch (error) {
+      // console.error("Failed to fetch districts:", error);
+    }
+  };
+
+  const fetchRegions = async () => {
+    try {
+      const data = await getAllRegions();
+      setRegions(data);
+    } catch (error) {
+      // console.error("Failed to fetch regions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDistricts();
+    fetchRegions();
+  }, []);
+
+  const handleCreate = () => {
+    setModalType('create');
+    setSelectedDistrict(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (district: any) => {
+    setModalType('edit');
+    setSelectedDistrict(district);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (district: any) => {
+    setModalType('delete');
+    setSelectedDistrict(district);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      if (modalType === 'create') {
+        await addDistrict(selectedDistrict);
+      } else if (modalType === 'edit') {
+        await updateDistrict(selectedDistrict);
+      } else if (modalType === 'delete') {
+        await deleteDistrict(selectedDistrict.id);
+      }
+      fetchDistricts();
+    } catch (error) {
+      // console.error(`Failed to ${modalType} district:`, error);
+    } finally {
+      setIsModalOpen(false);
+    }
+  };
+
+  const columns = ['ID', 'Name', 'Region'];
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">District Management</h2>
+      <SuperAdminTable
+        title="Districts"
+        data={districts}
+        columns={columns}
+        onCreate={handleCreate}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+      <CrudModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        title={`${modalType?.charAt(0).toUpperCase()}${modalType?.slice(1)} District`}
+      >
+        {modalType === 'delete' ? (
+          <p>Are you sure you want to delete this district?</p>
+        ) : (
+          <>
+            <input
+              type="text"
+              placeholder="District Name"
+              className="w-full p-2 border rounded-md mb-4"
+              value={selectedDistrict?.name || ''}
+              onChange={(e) => setSelectedDistrict({ ...selectedDistrict, name: e.target.value })}
+            />
+            <select
+              className="w-full p-2 border rounded-md"
+              value={selectedDistrict?.regionId || ''}
+              onChange={(e) => setSelectedDistrict({ ...selectedDistrict, regionId: e.target.value })}
+            >
+              <option value="">Select Region</option>
+              {regions.map((region: any) => (
+                <option key={region.id} value={region.id}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+      </CrudModal>
+    </div>
+  );
+};
+
+export default DistrictsPage;

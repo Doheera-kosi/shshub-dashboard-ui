@@ -23,16 +23,10 @@ const Menu = () => {
   );
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
 
-  const menuItems = [
+  const menuItems: MenuSection[] = [
     {
       title: "MENU",
       items: [
-        /* {
-          icon: "/home.png",
-          label: "Home",
-          href: "/",
-          visible: ["admin", "teacher", "student", "parent"],
-        }, */
         {
           icon: "/home.png",
           label: "Home",
@@ -42,8 +36,8 @@ const Menu = () => {
         {
           icon: "/home.png",
           label: "Home",
-          href: "/admin",
-          visible: ["admin"],
+          href: "/super-admin",
+          visible: ["super-admin"],
         },
         {
           icon: "/teacher.png",
@@ -132,6 +126,58 @@ const Menu = () => {
       ],
     },
     {
+      title: "MANAGEMENT",
+      items: [
+        {
+          icon: "/region.png",
+          label: "Regions",
+          href: "/list/management/regions",
+          visible: ["super-admin"],
+        },
+        {
+          icon: "/district.png",
+          label: "Districts",
+          href: "/list/management/districts",
+          visible: ["super-admin"],
+        },
+        {
+          icon: "/school.png",
+          label: "Schools",
+          href: "/list/management/schools",
+          visible: ["super-admin"],
+        },
+        {
+          icon: "/house.png",
+          label: "Houses",
+          href: "/list/management/houses",
+          visible: ["super-admin"],
+        },
+        {
+          icon: "/accommodation.png",
+          label: "Accommodations",
+          href: "/list/management/accommodations",
+          visible: ["super-admin"],
+        },
+      ],
+    },
+    {
+      title: "ACADEMICS",
+      items: [
+        {
+          icon: "/class.png",
+          label: "Classes",
+          href: "/list/academics/classes",
+          visible: ["super-admin"],
+        },
+        {
+          icon: "/programme.png",
+          label: "Programs",
+          href: "/list/academics/programs",
+          visible: ["super-admin"],
+        },
+      ],
+    },
+    {
       title: "ACTIONS",
       items: [
         {
@@ -173,7 +219,7 @@ const Menu = () => {
           icon: "/admin.png",
           label: "Super Admin",
           href: "/super-admin",
-          visible: ["admin"],
+          visible: ["super-admin"],
         },
       ],
     },
