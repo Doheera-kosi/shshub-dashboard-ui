@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   TrendingUp,
@@ -14,73 +15,48 @@ import {
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import ProgressBar from "./ProgressBar";
+import { getDashboardSummary } from "../services/dashboardService";
 
-const UserCard = ({ type }: { type: string }) => {
-  const data: { [key: string]: any } = {
-    Application: {
-      value: 1234,
-      new: 300,
-      pending: 400,
-      accepted: 500,
-      declined: 34,
-      percentageChange: 15,
-    },
-    Admission: {
-      value: 567,
-      boarding: 300,
-      day: 267,
-    },
-    Schools: {
-      value: 45,
-      new: 5,
-      pending: 10,
-    },
-    Zones: {
-      value: 12,
-      new: 2,
-      pending: 3,
-    },
-    Students: {
-      value: 120345,
-      new: 15000,
-      pending: 5000,
-    },
-    Teachers: {
-      value: 8765,
-      new: 500,
-      pending: 1200,
-    },
-    Accommodation: {
-      value: 890,
-      available: 450,
-      total: 890,
-      boys: {
-        total: 342,
-        occupied: 200
-      },
-      girls: {
-        total: 548,
-        occupied: 240
-      },
-    },
-        Fund: {
-      value: 2500000,
-      target: 3000000,
-      trend: 12,
-      sources: [
-        { name: "Fees", value: 1800000, color: "#A8E6A1" },
-        { name: "Gov", value: 500000, color: "#C3EBFA" },
-        { name: "Donations", value: 150000, color: "#FAE27C" },
-        { name: "Sponsorships", value: 50000, color: "#F7A6A6" },
-      ],
-    },
-  };
+interface UserCardProps {
+  type: string;
+  region?: string;
+  district?: string;
+  school?: string;
+}
 
-  const cardData = data[type];
+const UserCard = ({ type, region, district, school }: UserCardProps) => {
+  const [cardData, setCardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const summary = await getDashboardSummary(region, district, school);
+        if (summary) {
+          setCardData(summary[type]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard summary', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [region, district, school, type]);
+
+  if (loading) {
+    return <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">Loading...</div>;
+  }
+
+  if (!cardData) {
+    return <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">No data available</div>;
+  }
 
   const admissionData = [
-    { name: "Boarding", value: cardData.boarding },
-    { name: "Day", value: cardData.day },
+    { name: "Boarding", value: cardData.boarding || 0 },
+    { name: "Day", value: cardData.day || 0 },
   ];
 
   const COLORS = ["#D1B3F7", "#e8e8e8ff"];
@@ -92,6 +68,7 @@ const UserCard = ({ type }: { type: string }) => {
   };
 
   const formatNumber = (num: number) => {
+    if (num === undefined || num === null) return '0';
     if (num >= 1000000000) {
       return `${(num / 1000000000).toFixed(1).replace(/\.0$/, "")}B`;
     }
@@ -101,7 +78,7 @@ const UserCard = ({ type }: { type: string }) => {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1).replace(/\.0$/, "")}k`;
     }
-    return num;
+    return num.toString();
   };
 
   return (
@@ -125,7 +102,7 @@ const UserCard = ({ type }: { type: string }) => {
         </h1>
         <Image src="/more.png" alt="" width={20} height={20} />
       </div>
-      {type === "Application" && (
+      {type === "Application" && cardData && (
         <div className="mt-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center">
@@ -157,7 +134,7 @@ const UserCard = ({ type }: { type: string }) => {
           </div>
         </div>
       )}
-      {(type === "Schools" || type === "Zones" || type === "Students" || type === "Teachers") && (
+      {(type === "Schools" || type === "Zones" || type === "Students" || type === "Teachers") && cardData && (
         <div className="mt-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center">
@@ -171,7 +148,7 @@ const UserCard = ({ type }: { type: string }) => {
           </div>
         </div>
       )}
-      {type === "Admission" && (
+      {type === "Admission" && cardData && (
         <div className="relative">
           <ResponsiveContainer width="100%" height={100}>
             <PieChart>
@@ -221,7 +198,7 @@ const UserCard = ({ type }: { type: string }) => {
           </div>
         </div>
       )}
-      {type === "Accommodation" && (
+      {type === "Accommodation" && cardData && cardData.boys && cardData.girls && (
         <div className="mt-4">
           <div className="flex justify-between text-xs mt-1">
             <span className="text-gray-500">Overall Capacity</span>
@@ -238,22 +215,9 @@ const UserCard = ({ type }: { type: string }) => {
             <span className="font-bold">{`${Math.round(((cardData.girls.total - cardData.girls.occupied) / cardData.girls.total) * 100)}%`}</span>
           </div>
           <ProgressBar value={((cardData.girls.total - cardData.girls.occupied) / cardData.girls.total) * 100} color="#FAE27C" wrapperClassName="mt-1" />
-
-          {/* <div className="mt-2 text-sm">
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                    <span className="w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
-                    <span>Boys: {cardData.boys.total}</span>
-                </div>
-                <div className="flex items-center">
-                    <span className="w-3 h-3 rounded-full bg-pink-400 mr-2"></span>
-                    <span>Girls: {cardData.girls.total}</span>
-                </div>
-            </div>
-          </div> */}
         </div>
       )}
-      {type === "Fund" && (
+      {type === "Fund" && cardData && cardData.sources && (
         <div className="mt-4">
           <div className="flex justify-between items-center text-xs mb-1">
                         <span className="text-gray-500">Target: GH₵ {formatNumber(cardData.target)}</span>
@@ -278,9 +242,9 @@ const UserCard = ({ type }: { type: string }) => {
               <div
                 key={source.name}
                 className="h-full"
-                style={{ 
+                style={{
                   width: `${(source.value / cardData.target) * 100}%`,
-                  backgroundColor: source.color 
+                  backgroundColor: source.color
                 }}
               ></div>
             ))}
