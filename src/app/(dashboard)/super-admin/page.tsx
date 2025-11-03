@@ -12,22 +12,52 @@ import GenderCategorizationChart from "@/components/GenderCategorizationChart";
 import RegionalDistributionChart from "@/components/RegionalDistributionChart";
 import Configuration from "@/components/Configuration";
 import { useAppData } from "@/contexts/AppDataContext";
+import { getAllDistricts, getDistrictsByRegion } from "@/services/districtService";
+import { District } from "@/types/district";
+import { Building2, Map } from "lucide-react";
 
 interface School {
   id: string;
   name: string;
 }
 
-const SuperAdminPage = () => {
-  const { regions, districts, loading } = useAppData();
+export default function SuperAdminPage() {
+  const { regions } = useAppData();
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [districtCount, setDistrictCount] = useState(0);
   const [schools, setSchools] = useState<School[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedSchool, setSelectedSchool] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedSchool, setSelectedSchool] = useState<string>("");
 
   useEffect(() => {
-    localStorage.setItem("userType", "admin");
+    const fetchDistrictCount = async () => {
+      try {
+        const response = await getAllDistricts();
+        setDistrictCount(response.count);
+      } catch (error) {
+        console.error("Error fetching district count:", error);
+      }
+    };
+
+    fetchDistrictCount();
   }, []);
+
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (selectedRegion) {
+        try {
+          const fetchedDistricts = await getDistrictsByRegion(selectedRegion);
+          setDistricts(fetchedDistricts);
+        } catch (error) {
+          console.error("Error fetching districts:", error);
+          setDistricts([]);
+        }
+      }
+    };
+
+    fetchDistricts();
+  }, [selectedRegion]);
 
   useEffect(() => {
     // Fetch schools when a district is selected
@@ -68,10 +98,6 @@ const SuperAdminPage = () => {
     fetchSchools();
   }, [selectedDistrict]);
 
-  const filteredDistricts = selectedRegion
-    ? districts.filter((d) => d.regionId === selectedRegion)
-    : [];
-
   const cardLinks = {
     Regions: "/super-admin/regions",
     Districts: "/super-admin/districts",
@@ -106,7 +132,7 @@ const SuperAdminPage = () => {
           disabled={!selectedRegion}
         >
           <option value="">All Districts</option>
-          {filteredDistricts.map((district) => (
+          {districts.map((district) => (
             <option key={district.id} value={district.id}>
               {district.name}
             </option>
@@ -129,7 +155,7 @@ const SuperAdminPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <UserCard title="Regions" value={regions.length} type="Regions" />
-        <UserCard title="Districts" value={districts.length} type="Districts" />
+        <UserCard title="Districts" value={districtCount} type="Districts" />
         <UserCard title="Schools" value={schools.length} type="Schools" />
         <UserCard title="Upload" value="" type="Upload" />
       </div>
@@ -149,5 +175,3 @@ const SuperAdminPage = () => {
     </div>
   );
 };
-
-export default SuperAdminPage;

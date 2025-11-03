@@ -19,18 +19,29 @@ export const getAllDistricts = async () => {
   return response.data;
 };
 
+export const getDistrictsByRegion = async (regionId: string) => {
+  const response = await axios.get(`${BASE_API_URL}/districts/${regionId}`);
+  return response.data;
+};
+
 export const deleteDistrict = async (districtId: string) => {
-  const response = await axios.delete(`${BASE_API_URL}/districts/${districtId}`);
+  const response = await axios.delete(
+    `${BASE_API_URL}/districts/${districtId}`
+  );
   return response.data;
 };
 
 export const uploadDistricts = async (file: File) => {
   const formData = new FormData();
-  formData.append('file', file);
-  const response = await axios.post(`${BASE_API_URL}/districts/upload`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  formData.append("file", file);
+  const response = await axios.post(
+    `${BASE_API_URL}/districts/upload`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
   return response.data;
 };
