@@ -18,13 +18,15 @@ import ProgressBar from "./ProgressBar";
 import { getDashboardSummary } from "../services/dashboardService";
 
 interface UserCardProps {
+  title: string;
+  value?: number | string;
   type: string;
   region?: string;
   district?: string;
   school?: string;
 }
 
-const UserCard = ({ type, region, district, school }: UserCardProps) => {
+const UserCard = ({ title, value, type, region, district, school }: UserCardProps) => {
   const [cardData, setCardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,20 +45,24 @@ const UserCard = ({ type, region, district, school }: UserCardProps) => {
       }
     };
 
-    fetchData();
+    if (type !== 'Regions' && type !== 'Districts' && type !== 'Users') {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
   }, [region, district, school, type]);
 
   if (loading) {
     return <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">Loading...</div>;
   }
 
-  if (!cardData) {
+  if (!cardData && type !== 'Regions' && type !== 'Districts' && type !== 'Users') {
     return <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">No data available</div>;
   }
 
   const admissionData = [
-    { name: "Boarding", value: cardData.boarding || 0 },
-    { name: "Day", value: cardData.day || 0 },
+    { name: "Boarding", value: cardData?.boarding || 0 },
+    { name: "Day", value: cardData?.day || 0 },
   ];
 
   const COLORS = ["#D1B3F7", "#e8e8e8ff"];
@@ -67,38 +73,44 @@ const UserCard = ({ type, region, district, school }: UserCardProps) => {
     return "#A8E6A1"; // Green
   };
 
-  const formatNumber = (num: number) => {
+  const formatNumber = (num: number | string | null | undefined) => {
     if (num === undefined || num === null) return '0';
-    if (num >= 1000000000) {
-      return `${(num / 1000000000).toFixed(1).replace(/\.0$/, "")}B`;
+    const numericVal = typeof num === 'string' ? parseFloat(num) : num;
+    if (isNaN(numericVal)) return '0';
+    
+    if (numericVal >= 1000000000) {
+      return `${(numericVal / 1000000000).toFixed(1).replace(/\.0$/, "")}B`;
     }
-    if (num >= 1000000) {
-      return `${(num / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
+    if (numericVal >= 1000000) {
+      return `${(numericVal / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
     }
-    if (num >= 1000) {
-      return `${(num / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+    if (numericVal >= 1000) {
+      return `${(numericVal / 1000).toFixed(1).replace(/\.0$/, "")}k`;
     }
-    return num.toString();
+    return numericVal.toString();
   };
+
+  const displayValue = (type === 'Regions' || type === 'Districts' || type === 'Users') ? value : cardData?.value;
 
   return (
     <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="capitalize text-sm font-medium text-gray-600">{type}s</h2>
+        <h2 className="capitalize text-sm font-medium text-gray-600">{title}</h2>
         <span className="text-xs bg-gray-100 p-2 rounded-full text-gray-700">
           {type === "Application" && <FileText size={20} />}
           {type === "Admission" && <GraduationCap size={20} />}
           {type === "Accommodation" && <Bed size={20} />}
           {type === "Fund" && <Wallet size={20} />}
           {type === "Schools" && <Building size={20} />}
-          {type === "Zones" && <Map size={20} />}
-          {type === "Students" && <Users size={20} />}
+          {type === "Regions" && <Map size={20} />}
+          {type === "Districts" && <Map size={20} />}
+          {type === "Users" && <Users size={20} />}
           {type === "Teachers" && <Briefcase size={20} />}
         </span>
       </div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">
-          {type === "Fund" ? `GH₵ ${formatNumber(cardData.value)}` : formatNumber(cardData.value)}
+          {type === "Fund" ? `GH₵ ${formatNumber(displayValue)}` : formatNumber(value || displayValue)}
         </h1>
         <Image src="/more.png" alt="" width={20} height={20} />
       </div>

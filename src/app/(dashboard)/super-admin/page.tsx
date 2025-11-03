@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import NationalStats from "@/components/NationalStats";
 import PlacementOverride from "@/components/PlacementOverride";
 import UserManagement from "@/components/UserManagement";
@@ -10,64 +11,23 @@ import BoardingStatusChart from "@/components/BoardingStatusChart";
 import GenderCategorizationChart from "@/components/GenderCategorizationChart";
 import RegionalDistributionChart from "@/components/RegionalDistributionChart";
 import Configuration from "@/components/Configuration";
+import { useAppData } from "@/contexts/AppDataContext";
+
+interface School {
+  id: string;
+  name: string;
+}
 
 const SuperAdminPage = () => {
-  const [regions, setRegions] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [schools, setSchools] = useState([]);
+  const { regions, districts, loading } = useAppData();
+  const [schools, setSchools] = useState<School[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedSchool, setSelectedSchool] = useState("");
 
   useEffect(() => {
-    // Fetch regions on component mount
-    const fetchRegions = async () => {
-      // In a real application, you would fetch this from an API
-      const mockRegions = [
-        { id: "1", name: "Greater Accra" },
-        { id: "2", name: "Ashanti" },
-        { id: "3", name: "Western" },
-      ];
-      setRegions(mockRegions);
-    };
-
-    fetchRegions();
     localStorage.setItem("userType", "admin");
   }, []);
-
-  useEffect(() => {
-    // Fetch districts when a region is selected
-    const fetchDistricts = async () => {
-      if (selectedRegion) {
-        // In a real application, you would fetch this from an API
-        const mockDistricts = {
-          "1": [
-            { id: "101", name: "Accra Metropolis" },
-            { id: "102", name: "Tema Metropolis" },
-          ],
-          "2": [
-            { id: "201", name: "Kumasi Metropolis" },
-            { id: "202", name: "Obuasi Municipal" },
-          ],
-          "3": [
-            { id: "301", name: "Sekondi-Takoradi Metropolis" },
-            { id: "302", name: "Tarkwa-Nsuaem Municipal" },
-          ],
-        };
-        setDistricts(mockDistricts[selectedRegion] || []);
-        setSelectedDistrict("");
-        setSchools([]);
-        setSelectedSchool("");
-      } else {
-        setDistricts([]);
-        setSelectedDistrict("");
-        setSchools([]);
-        setSelectedSchool("");
-      }
-    };
-
-    fetchDistricts();
-  }, [selectedRegion]);
 
   useEffect(() => {
     // Fetch schools when a district is selected
@@ -108,6 +68,20 @@ const SuperAdminPage = () => {
     fetchSchools();
   }, [selectedDistrict]);
 
+  const filteredDistricts = selectedRegion
+    ? districts.filter((d) => d.regionId === selectedRegion)
+    : [];
+
+  const cardLinks = {
+    Regions: "/super-admin/regions",
+    Districts: "/super-admin/districts",
+    Schools: "/super-admin/schools",
+    Students: "/super-admin/students",
+    Teachers: "/super-admin/teachers",
+    Users: "/super-admin/users",
+    Upload: "/super-admin/upload",
+  };
+
   return (
     <div className="bg-gray-100 p-8 rounded-lg shadow-inner">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Super Admin Dashboard</h1>
@@ -132,7 +106,7 @@ const SuperAdminPage = () => {
           disabled={!selectedRegion}
         >
           <option value="">All Districts</option>
-          {districts.map((district) => (
+          {filteredDistricts.map((district) => (
             <option key={district.id} value={district.id}>
               {district.name}
             </option>
@@ -154,10 +128,10 @@ const SuperAdminPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <UserCard type="Schools" region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
-        <UserCard type="Zones" region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
-        <UserCard type="Students" region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
-        <UserCard type="Teachers" region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
+        <UserCard title="Regions" value={regions.length} type="Regions" />
+        <UserCard title="Districts" value={districts.length} type="Districts" />
+        <UserCard title="Schools" value={schools.length} type="Schools" />
+        <UserCard title="Upload" value="" type="Upload" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -168,7 +142,7 @@ const SuperAdminPage = () => {
       <RegionalDistributionChart region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <UserManagement />
+        <UserManagement regionCount={regions.length} />
         <PlacementOverride />
         <Configuration />
       </div>

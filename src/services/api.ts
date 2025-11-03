@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://84.247.136.103/shshub/api/v1/';
+export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://84.247.136.103/shshub/api/v1';
 
 export interface GuardianData {
   id?: number;

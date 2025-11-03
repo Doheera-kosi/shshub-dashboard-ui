@@ -1,16 +1,17 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import SuperAdminTable from '@/components/super-admin/SuperAdminTable';
 import CrudModal from '@/components/super-admin/CrudModal';
-import { getAllDistricts, addDistrict, updateDistrict, deleteDistrict } from '@/services/districtService';
+import { getAllDistricts, addDistrict, updateDistrict, deleteDistrict, uploadDistricts } from '@/services/districtService';
+import UploadExcelModal from '@/components/UploadExcelModal';
 import { getAllRegions } from '@/services/regionService';
 
 const DistrictsPage = () => {
   const [districts, setDistricts] = useState([]);
   const [regions, setRegions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'create' | 'edit' | 'delete' | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
 
@@ -58,7 +59,7 @@ const DistrictsPage = () => {
   const handleSave = async () => {
     try {
       if (modalType === 'create') {
-        await addDistrict(selectedDistrict);
+        await addDistrict("1", { name: selectedDistrict.name });
       } else if (modalType === 'edit') {
         await updateDistrict(selectedDistrict);
       } else if (modalType === 'delete') {
@@ -77,6 +78,14 @@ const DistrictsPage = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">District Management</h2>
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded-md mr-2"
+          onClick={() => setIsUploadModalOpen(true)}
+        >
+          Upload Districts
+        </button>
+      </div>
       <SuperAdminTable
         title="Districts"
         data={districts}
@@ -117,6 +126,18 @@ const DistrictsPage = () => {
           </>
         )}
       </CrudModal>
+      <UploadExcelModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUpload={async (file) => {
+          try {
+            await uploadDistricts(file);
+            fetchDistricts();
+          } catch (error) {
+            console.error("Failed to upload districts:", error);
+          }
+        }}
+      />
     </div>
   );
 };

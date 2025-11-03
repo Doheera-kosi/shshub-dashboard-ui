@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import SuperAdminTable from '@/components/super-admin/SuperAdminTable';
 import CrudModal from '@/components/super-admin/CrudModal';
-import { getAllRegions, createRegion, updateRegion, deleteRegion } from '@/services/regionService';
+import { getAllRegions, createRegion, updateRegion, deleteRegion, uploadRegions } from '@/services/regionService';
+import UploadExcelModal from '@/components/UploadExcelModal';
 
 const RegionsPage = () => {
   const [regions, setRegions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'create' | 'edit' | 'delete' | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<any>(null);
 
@@ -47,7 +49,7 @@ const RegionsPage = () => {
       if (modalType === 'create') {
         await createRegion({ name: selectedRegion.name });
       } else if (modalType === 'edit') {
-        await updateRegion(selectedRegion);
+        await updateRegion({ id: selectedRegion.id, name: selectedRegion.name, updatedBy: 'user' });
       } else if (modalType === 'delete') {
         await deleteRegion(selectedRegion.id);
       }
@@ -64,6 +66,14 @@ const RegionsPage = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">Region Management</h2>
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded-md mr-2"
+          onClick={() => setIsUploadModalOpen(true)}
+        >
+          Upload Regions
+        </button>
+      </div>
       <SuperAdminTable
         title="Regions"
         data={regions}
@@ -90,6 +100,18 @@ const RegionsPage = () => {
           />
         )}
       </CrudModal>
+      <UploadExcelModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUpload={async (file) => {
+          try {
+            await uploadRegions(file);
+            fetchRegions();
+          } catch (error) {
+            console.error("Failed to upload regions:", error);
+          }
+        }}
+      />
     </div>
   );
 };
