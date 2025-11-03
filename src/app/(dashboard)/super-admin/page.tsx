@@ -168,7 +168,7 @@ export default function SuperAdminPage() {
       <RegionalDistributionChart region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <UserManagement regionCount={regions.length} />
+        <UserManagement regionCount={regions.length} districtCount={districtCount} />
         <PlacementOverride />
         <Configuration />
       </div>

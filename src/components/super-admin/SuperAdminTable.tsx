@@ -40,7 +40,7 @@ const SuperAdminTable: React.FC<SuperAdminTableProps> = ({ title, data, columns,
             <tr key={index}>
               {columns.map((column) => (
                 <td key={column} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {item[column.toLowerCase()]}
+                  {column === 'Region ID' ? item.regionId : item[column.toLowerCase()]}
                 </td>
               ))}
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

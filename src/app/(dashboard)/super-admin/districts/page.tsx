@@ -5,11 +5,9 @@ import SuperAdminTable from '@/components/super-admin/SuperAdminTable';
 import CrudModal from '@/components/super-admin/CrudModal';
 import { getAllDistricts, addDistrict, updateDistrict, deleteDistrict, uploadDistricts } from '@/services/districtService';
 import UploadExcelModal from '@/components/UploadExcelModal';
-import { getAllRegions } from '@/services/regionService';
 
 const DistrictsPage = () => {
   const [districts, setDistricts] = useState([]);
-  const [regions, setRegions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'create' | 'edit' | 'delete' | null>(null);
@@ -18,24 +16,14 @@ const DistrictsPage = () => {
   const fetchDistricts = async () => {
     try {
       const data = await getAllDistricts();
-      setDistricts(data);
+      setDistricts(data.districts);
     } catch (error) {
       // console.error("Failed to fetch districts:", error);
     }
   };
 
-  const fetchRegions = async () => {
-    try {
-      const data = await getAllRegions();
-      setRegions(data);
-    } catch (error) {
-      // console.error("Failed to fetch regions:", error);
-    }
-  };
-
   useEffect(() => {
     fetchDistricts();
-    fetchRegions();
   }, []);
 
   const handleCreate = () => {
@@ -59,9 +47,9 @@ const DistrictsPage = () => {
   const handleSave = async () => {
     try {
       if (modalType === 'create') {
-        await addDistrict("1", { name: selectedDistrict.name });
+        await addDistrict(selectedDistrict.regionId, { name: selectedDistrict.name });
       } else if (modalType === 'edit') {
-        await updateDistrict(selectedDistrict);
+        await updateDistrict({ id: selectedDistrict.id, name: selectedDistrict.name, updatedBy: 'user' });
       } else if (modalType === 'delete') {
         await deleteDistrict(selectedDistrict.id);
       }
@@ -73,7 +61,7 @@ const DistrictsPage = () => {
     }
   };
 
-  const columns = ['ID', 'Name', 'Region'];
+  const columns = ['ID', 'Name', 'Region ID'];
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -106,23 +94,25 @@ const DistrictsPage = () => {
           <>
             <input
               type="text"
+              placeholder="ID"
+              className="w-full p-2 border rounded-md mb-2 bg-gray-100"
+              value={selectedDistrict?.id || ''}
+              disabled
+            />
+            <input
+              type="text"
               placeholder="District Name"
-              className="w-full p-2 border rounded-md mb-4"
+              className="w-full p-2 border rounded-md mb-2"
               value={selectedDistrict?.name || ''}
               onChange={(e) => setSelectedDistrict({ ...selectedDistrict, name: e.target.value })}
             />
-            <select
-              className="w-full p-2 border rounded-md"
+            <input
+              type="text"
+              placeholder="Region ID"
+              className="w-full p-2 border rounded-md bg-gray-100"
               value={selectedDistrict?.regionId || ''}
-              onChange={(e) => setSelectedDistrict({ ...selectedDistrict, regionId: e.target.value })}
-            >
-              <option value="">Select Region</option>
-              {regions.map((region: any) => (
-                <option key={region.id} value={region.id}>
-                  {region.name}
-                </option>
-              ))}
-            </select>
+              disabled
+            />
           </>
         )}
       </CrudModal>

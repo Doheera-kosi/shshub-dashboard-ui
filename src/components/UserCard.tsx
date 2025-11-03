@@ -26,6 +26,8 @@ interface UserCardProps {
   school?: string;
 }
 
+type Color = "indigo" | "red" | "gray" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink";
+
 const UserCard = ({ title, value, type, region, district, school }: UserCardProps) => {
   const [cardData, setCardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -90,22 +92,61 @@ const UserCard = ({ title, value, type, region, district, school }: UserCardProp
     return numericVal.toString();
   };
 
+  const getCardInfo = (
+    type: string
+  ): { icon: React.ElementType; color: Color } => {
+    switch (type) {
+      case "Application":
+        return { icon: FileText, color: "indigo" };
+      case "Admission":
+        return { icon: GraduationCap, color: "red" };
+      case "Accommodation":
+        return { icon: Bed, color: "gray" };
+      case "Fund":
+        return { icon: Wallet, color: "orange" };
+      case "Schools":
+        return { icon: Building, color: "yellow" };
+      case "Regions":
+        return { icon: Map, color: "green" };
+      case "Districts":
+        return { icon: Map, color: "blue" };
+      case "Users":
+        return { icon: Users, color: "purple" };
+      case "Teachers":
+        return { icon: Briefcase, color: "pink" };
+      default:
+        return { icon: Users, color: "gray" };
+    }
+  };
+
+  const getCardColors = (type: string) => {
+    switch (type) {
+      case 'Regions':
+        return 'bg-green-100 text-green-800';
+      case 'Districts':
+        return 'bg-blue-100 text-blue-800';
+      case 'Schools':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Students':
+        return 'bg-purple-100 text-purple-800';
+      case 'Teachers':
+        return 'bg-orange-100 text-orange-800';
+      case 'Upload':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-white text-gray-800';
+    }
+  };
+
+  const { icon: Icon, color: iconColor } = getCardInfo(type);
   const displayValue = (type === 'Regions' || type === 'Districts' || type === 'Users') ? value : cardData?.value;
 
   return (
-    <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">
+    <div className={`rounded-lg p-4 shadow-md flex-1 min-w-[150px] ${getCardColors(type)}`}>
       <div className="flex justify-between items-center mb-3">
-        <h2 className="capitalize text-sm font-medium text-gray-600">{title}</h2>
-        <span className="text-xs bg-gray-100 p-2 rounded-full text-gray-700">
-          {type === "Application" && <FileText size={20} />}
-          {type === "Admission" && <GraduationCap size={20} />}
-          {type === "Accommodation" && <Bed size={20} />}
-          {type === "Fund" && <Wallet size={20} />}
-          {type === "Schools" && <Building size={20} />}
-          {type === "Regions" && <Map size={20} />}
-          {type === "Districts" && <Map size={20} />}
-          {type === "Users" && <Users size={20} />}
-          {type === "Teachers" && <Briefcase size={20} />}
+        <h2 className="capitalize text-sm font-medium">{title}</h2>
+        <span className={`p-2 rounded-full bg-${iconColor}-100 text-${iconColor}-500`}>
+          <Icon size={20} />
         </span>
       </div>
       <div className="flex items-center justify-between">

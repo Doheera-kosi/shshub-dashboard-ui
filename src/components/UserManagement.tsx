@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getAllStudents } from '@/services/studentService';
 
-const UserManagement = ({ regionCount }) => {
+const UserManagement = ({ regionCount, districtCount }) => {
   const router = useRouter();
   const [studentCount, setStudentCount] = useState(0);
 
@@ -56,10 +56,10 @@ const UserManagement = ({ regionCount }) => {
             <Users size={24} className="text-green-500 mr-3" />
             <div>
               <h3 className="text-md font-semibold">Districts</h3>
-              <p className="text-sm text-gray-500">275</p>
+              <p className="text-sm text-gray-500">{districtCount > 0 ? districtCount : 'No districts yet'}</p>
             </div>
           </div>
-          <button className="bg-green-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
+          <button onClick={() => router.push('/super-admin/districts')} className="bg-green-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
         </div>
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
