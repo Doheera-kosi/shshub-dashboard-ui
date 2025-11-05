@@ -15,6 +15,7 @@ import { useAppData } from "@/contexts/AppDataContext";
 import { getAllDistricts, getDistrictsByRegion } from "@/services/districtService";
 import { District } from "@/types/district";
 import { Building2, Map } from "lucide-react";
+import AdmissionsCountCard from "@/components/super-admin/AdmissionsCountCard";
 
 interface School {
   id: string;
@@ -154,6 +155,7 @@ export default function SuperAdminPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <AdmissionsCountCard />
         <UserCard title="Regions" value={regions.length} type="Regions" />
         <UserCard title="Districts" value={districtCount} type="Districts" />
         <UserCard title="Schools" value={schools.length} type="Schools" />
