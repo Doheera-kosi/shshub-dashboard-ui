@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { getAllStudents } from '@/services/studentService';
+import { Student } from '@/types/student';
 
 const StudentManagementPage = () => {
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState<Student[]>([]);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -35,7 +36,7 @@ const StudentManagementPage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {students.map((student: any) => (
+            {students.map((student: Student) => (
               <tr key={student.id}>
                 <td className="px-6 py-4 whitespace-nowrap">{student.fullName}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{student.email}</td>

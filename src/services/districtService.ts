@@ -16,12 +16,12 @@ export const updateDistrict = async (districtData: any) => {
 
 export const getAllDistricts = async () => {
   const response = await axios.get(`${BASE_API_URL}/districts`);
-  return response.data;
+  return response.data.data;
 };
 
 export const getDistrictsByRegion = async (regionId: string) => {
   const response = await axios.get(`${BASE_API_URL}/districts/${regionId}`);
-  return response.data;
+  return response.data.data;
 };
 
 export const deleteDistrict = async (districtId: string) => {

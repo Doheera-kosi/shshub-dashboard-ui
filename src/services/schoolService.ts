@@ -19,6 +19,16 @@ export const getAllSchools = async () => {
   return response.data;
 };
 
+export const getSchoolsByDistrict = async (districtId: string) => {
+    const response = await axios.get(`${BASE_API_URL}/schools/${districtId}`);
+    return response.data.data;
+};
+
+export const getSchoolDetails = async (schoolId: string) => {
+    const response = await axios.get(`${BASE_API_URL}/schools/${schoolId}`);
+    return response.data;
+};
+
 export const deleteSchool = async (schoolId: string) => {
   const response = await axios.delete(`${BASE_API_URL}/schools/${schoolId}`);
   return response.data;

@@ -47,7 +47,7 @@ const UserCard = ({ title, value, type, region, district, school }: UserCardProp
       }
     };
 
-    if (type !== 'Regions' && type !== 'Districts' && type !== 'Users') {
+    if (type !== 'Regions' && type !== 'Districts' && type !== 'Users' && type !== 'Schools' && type !== 'Upload') {
       fetchData();
     } else {
       setLoading(false);
@@ -58,7 +58,7 @@ const UserCard = ({ title, value, type, region, district, school }: UserCardProp
     return <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">Loading...</div>;
   }
 
-  if (!cardData && type !== 'Regions' && type !== 'Districts' && type !== 'Users') {
+  if (!cardData && type !== 'Regions' && type !== 'Districts' && type !== 'Users' && type !== 'Schools' && type !== 'Upload') {
     return <div className="rounded-lg bg-white p-4 shadow-md flex-1 min-w-[150px]">No data available</div>;
   }
 
@@ -100,24 +100,26 @@ const UserCard = ({ title, value, type, region, district, school }: UserCardProp
         return { icon: FileText, color: "indigo" };
       case "Admission":
         return { icon: GraduationCap, color: "red" };
-      case "Accommodation":
+      case "Boarding":
         return { icon: Bed, color: "gray" };
-      case "Fund":
+      case "Fees":
         return { icon: Wallet, color: "orange" };
-      case "Schools":
-        return { icon: Building, color: "yellow" };
       case "Regions":
-        return { icon: Map, color: "green" };
+        return { icon: Map, color: "yellow" };
       case "Districts":
-        return { icon: Map, color: "blue" };
+        return { icon: Building, color: "green" };
+      case "Schools":
+        return { icon: Building, color: "blue" };
       case "Users":
         return { icon: Users, color: "purple" };
-      case "Teachers":
+      case "Upload":
         return { icon: Briefcase, color: "pink" };
       default:
-        return { icon: Users, color: "gray" };
+        return { icon: TrendingUp, color: "blue" };
     }
   };
+
+  const cardInfo = getCardInfo(type);
 
   const getCardColors = (type: string) => {
     switch (type) {

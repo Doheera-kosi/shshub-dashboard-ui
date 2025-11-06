@@ -8,6 +8,7 @@ import UploadExcelModal from '@/components/UploadExcelModal';
 
 const DistrictsPage = () => {
   const [districts, setDistricts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'create' | 'edit' | 'delete' | null>(null);
@@ -16,7 +17,7 @@ const DistrictsPage = () => {
   const fetchDistricts = async () => {
     try {
       const data = await getAllDistricts();
-      setDistricts(data.districts);
+      setDistricts(data);
     } catch (error) {
       // console.error("Failed to fetch districts:", error);
     }
@@ -61,6 +62,13 @@ const DistrictsPage = () => {
     }
   };
 
+  const filteredDistricts = districts.filter(
+    (district) =>
+      (district.id?.toString().toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (district.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (district.regionId?.toString().toLowerCase() || '').includes(searchTerm.toLowerCase())
+  );
+
   const columns = ['ID', 'Name', 'Region ID'];
 
   return (
@@ -68,7 +76,7 @@ const DistrictsPage = () => {
       <h2 className="text-2xl font-bold mb-4">District Management</h2>
       <div className="flex justify-end mb-4">
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded-md mr-2"
+          className="bg-green-500 text-white px-4 py-2 rounded-md"
           onClick={() => setIsUploadModalOpen(true)}
         >
           Upload Districts
@@ -76,8 +84,10 @@ const DistrictsPage = () => {
       </div>
       <SuperAdminTable
         title="Districts"
-        data={districts}
+        data={filteredDistricts}
         columns={columns}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
         onCreate={handleCreate}
         onEdit={handleEdit}
         onDelete={handleDelete}

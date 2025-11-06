@@ -14,90 +14,116 @@ import Configuration from "@/components/Configuration";
 import { useAppData } from "@/contexts/AppDataContext";
 import { getAllDistricts, getDistrictsByRegion } from "@/services/districtService";
 import { District } from "@/types/district";
+import { getAllSchools, getSchoolsByDistrict, getSchoolDetails } from "@/services/schoolService";
+import { School } from "@/types/school";
 import { Building2, Map } from "lucide-react";
 import AdmissionsCountCard from "@/components/super-admin/AdmissionsCountCard";
-
-interface School {
-  id: string;
-  name: string;
-}
+import SearchableSelect from "@/components/SearchableSelect";
+import FilterPopup from "@/components/FilterPopup";
+import { Filter } from "lucide-react";
+import { useOnClickOutside } from "@/hooks/useOnClickOutside";
+import { useRef } from "react";
 
 export default function SuperAdminPage() {
-  const { regions } = useAppData();
-  const [districts, setDistricts] = useState<District[]>([]);
-  const [districtCount, setDistrictCount] = useState(0);
+  const { regions, districts: allDistricts, loading } = useAppData();
+  const [filteredDistricts, setFilteredDistricts] = useState<District[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string>("");
-  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-  const [selectedSchool, setSelectedSchool] = useState<string>("");
+  const [allSchools, setAllSchools] = useState<School[]>([]);
+  const [schoolCount, setSchoolCount] = useState(0);
+  const [selectedRegion, setSelectedRegion] = useState<{ value: string; label: string } | null>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<{ value: string; label: string } | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<{ value: string; label: string } | null>(null);
+  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside(filterRef, () => setIsFilterPopupOpen(false));
 
   useEffect(() => {
-    const fetchDistrictCount = async () => {
+    const fetchAllSchools = async () => {
       try {
-        const response = await getAllDistricts();
-        setDistrictCount(response.count);
+        const { data, count } = await getAllSchools();
+        setAllSchools(data);
+        setSchoolCount(count);
       } catch (error) {
-        console.error("Error fetching district count:", error);
+        console.error("Error fetching all schools:", error);
       }
     };
 
-    fetchDistrictCount();
+    fetchAllSchools();
   }, []);
 
   useEffect(() => {
     const fetchDistricts = async () => {
       if (selectedRegion) {
         try {
-          const fetchedDistricts = await getDistrictsByRegion(selectedRegion);
-          setDistricts(fetchedDistricts);
+          const fetchedDistricts = await getDistrictsByRegion(selectedRegion.value);
+          setFilteredDistricts(fetchedDistricts);
         } catch (error) {
           console.error("Error fetching districts:", error);
-          setDistricts([]);
+          setFilteredDistricts([]);
+        }
+      } else {
+        setFilteredDistricts(allDistricts);
+      }
+      setSelectedDistrict(null);
+      setSchools([]);
+      setSelectedSchool(null);
+    };
+
+    fetchDistricts();
+  }, [selectedRegion, allDistricts]);
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      if (selectedDistrict) {
+        try {
+          const fetchedSchools = await getSchoolsByDistrict(selectedDistrict.value);
+          setSchools(fetchedSchools);
+        } catch (error) {
+          console.error("Error fetching schools:", error);
+          setSchools([]);
+        }
+      } else {
+        setSchools(allSchools);
+      }
+      setSelectedSchool(null);
+    };
+
+    fetchSchools();
+  }, [selectedDistrict, allSchools]);
+
+  useEffect(() => {
+    const fetchSchoolDetails = async () => {
+      if (selectedSchool && selectedSchool.value) {
+        try {
+          const schoolDetails = await getSchoolDetails(selectedSchool.value);
+          if (regions) {
+            const region = regions.find(r => r.id === schoolDetails.district.region.id);
+            if (region) {
+              setSelectedRegion({ value: region.id, label: region.name });
+            }
+          }
+          const district = {
+            value: schoolDetails.district.id,
+            label: schoolDetails.district.name
+          };
+          setSelectedDistrict(district);
+        } catch (error) {
+          console.error("Error fetching school details:", error);
         }
       }
     };
 
-    fetchDistricts();
-  }, [selectedRegion]);
+    fetchSchoolDetails();
+  }, [selectedSchool, regions]);
 
-  useEffect(() => {
-    // Fetch schools when a district is selected
-    const fetchSchools = async () => {
-      if (selectedDistrict) {
-        // In a real application, you would fetch this from an API
-        const mockSchools = {
-          "101": [
-            { id: "10101", name: "Achimota School" },
-            { id: "10102", name: "Accra Academy" },
-          ],
-          "102": [
-            { id: "10201", name: "Tema Secondary School" },
-            { id: "10202", name: "Chemu Senior High School" },
-          ],
-          "201": [
-            { id: "20101", name: "Prempeh College" },
-            { id: "20102", name: "Opoku Ware School" },
-          ],
-          "202": [
-            { id: "20201", name: "Obuasi Senior High Technical School" },
-          ],
-          "301": [
-            { id: "30101", name: "St. John's School" },
-          ],
-          "302": [
-            { id: "30201", name: "Tarkwa Senior High School" },
-          ],
-        };
-        setSchools(mockSchools[selectedDistrict] || []);
-        setSelectedSchool("");
-      } else {
-        setSchools([]);
-        setSelectedSchool("");
-      }
-    };
+  const handleRegionChange = (selectedOption: { value: string; label: string } | null) => {
+    setSelectedRegion(selectedOption);
+  };
 
-    fetchSchools();
-  }, [selectedDistrict]);
+  const handleDistrictChange = (selectedOption: { value: string; label: string } | null) => {
+    setSelectedDistrict(selectedOption);
+  };
 
   const cardLinks = {
     Regions: "/super-admin/regions",
@@ -111,69 +137,53 @@ export default function SuperAdminPage() {
 
   return (
     <div className="bg-gray-100 p-8 rounded-lg shadow-inner">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Super Admin Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <select
-          className="border border-gray-200 p-2 rounded-lg"
-          value={selectedRegion}
-          onChange={(e) => setSelectedRegion(e.target.value)}
-        >
-          <option value="">All Regions</option>
-          {regions.map((region) => (
-            <option key={region.id} value={region.id}>
-              {region.name}
-            </option>
-          ))}
-        </select>
-        <select
-          className="border border-gray-200 p-2 rounded-lg"
-          value={selectedDistrict}
-          onChange={(e) => setSelectedDistrict(e.target.value)}
-          disabled={!selectedRegion}
-        >
-          <option value="">All Districts</option>
-          {districts.map((district) => (
-            <option key={district.id} value={district.id}>
-              {district.name}
-            </option>
-          ))}
-        </select>
-        <select
-          className="border border-gray-200 p-2 rounded-lg"
-          value={selectedSchool}
-          onChange={(e) => setSelectedSchool(e.target.value)}
-          disabled={!selectedDistrict}
-        >
-          <option value="">All Schools</option>
-          {schools.map((school) => (
-            <option key={school.id} value={school.id}>
-              {school.name}
-            </option>
-          ))}
-        </select>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Super Admin Dashboard</h1>
+        <div className="relative" ref={filterRef}>
+          <button
+            onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
+            className="flex items-center gap-2 px-4 py-2 bg-white rounded-md shadow-md"
+          >
+            <Filter size={20} />
+            <span>Filters</span>
+          </button>
+          {isFilterPopupOpen && (
+            <FilterPopup
+              regions={regions || []}
+              districts={filteredDistricts || []}
+              schools={schools || []}
+              selectedRegion={selectedRegion}
+              setSelectedRegion={handleRegionChange}
+              selectedDistrict={selectedDistrict}
+              setSelectedDistrict={handleDistrictChange}
+              selectedSchool={selectedSchool}
+              setSelectedSchool={setSelectedSchool}
+              onClose={() => setIsFilterPopupOpen(false)}
+            />
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <AdmissionsCountCard />
-        <UserCard title="Regions" value={regions.length} type="Regions" />
-        <UserCard title="Districts" value={districtCount} type="Districts" />
-        <UserCard title="Schools" value={schools.length} type="Schools" />
+        <UserCard title="Regions" value={(regions || []).length} type="Regions" />
+        <UserCard title="Districts" value={(allDistricts || []).length} type="Districts" />
+        <UserCard title="Schools" value={schoolCount} type="Schools" />
         <UserCard title="Upload" value="" type="Upload" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <BoardingStatusChart region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
-        <GenderCategorizationChart region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <BoardingStatusChart region={selectedRegion?.value} district={selectedDistrict?.value} school={selectedSchool?.value} />
+          <GenderCategorizationChart region={selectedRegion?.value} district={selectedDistrict?.value} school={selectedSchool?.value} />
       </div>
 
-      <RegionalDistributionChart region={selectedRegion} district={selectedDistrict} school={selectedSchool} />
+      <RegionalDistributionChart region={selectedRegion?.value} district={selectedDistrict?.value} school={selectedSchool?.value} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <UserManagement regionCount={regions.length} districtCount={districtCount} />
+        <UserManagement regionCount={(regions || []).length} districtCount={(allDistricts || []).length} />
         <PlacementOverride />
         <Configuration />
       </div>
     </div>
   );
-};
+}

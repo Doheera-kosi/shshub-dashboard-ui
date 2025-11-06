@@ -14,8 +14,8 @@ const AdmissionsCountCard = () => {
   useEffect(() => {
     const fetchAdmissionsCount = async () => {
       try {
-        const count = await getAdmissionsCount();
-        setAdmissionsCount(count);
+        const data = await getAdmissionsCount();
+        setAdmissionsCount(data.count);
       } catch (error) {
         console.error('Error fetching admissions count:', error);
       } finally {
@@ -32,13 +32,13 @@ const AdmissionsCountCard = () => {
       trigger={
         <Card className='shadow-lg rounded-xl p-4 bg-gradient-to-br from-purple-500 to-indigo-600 text-white cursor-pointer'>
           <div className='flex justify-between items-start'>
-            <h2 className='text-lg font-semibold'>Admissions</h2>
+            <h3 className=''>Admissions</h3>
             <Users className='h-6 w-6' />
           </div>
           {loading ? (
-            <div className='text-3xl font-bold mt-2'>...</div>
+            <div className='text-2xl font-semibold mt-2'>...</div>
           ) : (
-            <div className='text-3xl font-bold mt-2'>{admissionsCount}</div>
+            <div className='text-5xl font-bold mt-2'>{admissionsCount}</div>
           )}
           <p className='text-xs text-indigo-200 mt-1'>+20.1% from last month</p>
         </Card>
@@ -84,7 +84,7 @@ const AdmissionsCountCard = () => {
           {loading ? (
             <div className='text-2xl font-bold'>...</div>
           ) : (
-            <div className='text-2xl font-bold'>{admissionsCount}</div>
+            <div className='text-3xl font-bold'>{admissionsCount}</div>
           )}
         </Card>
       </div>
