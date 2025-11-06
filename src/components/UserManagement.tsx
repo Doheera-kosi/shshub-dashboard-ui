@@ -5,7 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getAllStudents } from '@/services/studentService';
 
-const UserManagement = ({ regionCount, districtCount }) => {
+interface UserManagementProps {
+  regionCount: number;
+  districtCount: number;
+}
+
+const UserManagement: React.FC<UserManagementProps> = ({ regionCount, districtCount }) => {
   const router = useRouter();
   const [studentCount, setStudentCount] = useState(0);
 
