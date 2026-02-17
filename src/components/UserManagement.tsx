@@ -41,7 +41,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ regionCount, districtCo
           </div>
           <button onClick={() => router.push('/super-admin/users')} className="bg-purple-500 text-white px-3 py-1 rounded-md text-sm">Manage</button>
         </div>
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg ">
           <div className="flex items-center">
             <Map size={24} className="text-blue-500 mr-3" />
             <div>
